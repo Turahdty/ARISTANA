@@ -1,0 +1,4216 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <title>ARISTANA ADMINISTRASI KEUANGAN TERINTEGRASI POLRES TABANAN</title>
+  <!-- SheetJS untuk membaca file Excel (.xlsx / .xls / .csv) langsung di browser -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    /* ================= TEMA ARISTANA ADMINISTRASI KEUANGAN TERINTEGRASI POLRES TABANAN ================= */
+    :root {
+      --sakti-navy: #0a2540;
+      --sakti-navy-deep: #061829;
+      --sakti-blue: #0d47a1;
+      --sakti-blue-mid: #1565c0;
+      --sakti-gold: #f5b700;
+      --sakti-gold-soft: #fff8e1;
+      --sakti-bg: #eef2f6;
+      --sakti-surface: #ffffff;
+      --sakti-border: #d5dfea;
+      --sakti-text: #1e293b;
+      --sakti-muted: #5c6f82;
+      --sakti-green: #15803d;
+      --sakti-green-bg: #ecfdf3;
+      --sakti-red: #b91c1c;
+      --sakti-red-bg: #fef2f2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--sakti-bg);
+      font: 13.5px/1.45 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      color: var(--sakti-text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #appMainShell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ================= HALAMAN LOGIN PERTAMA (FULL-PAGE GATE) ================= */
+    .login-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: radial-gradient(circle at top right, #164e87 0%, var(--sakti-navy) 48%, var(--sakti-navy-deep) 100%);
+      padding: 20px 16px;
+    }
+    .login-center-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 0;
+    }
+    .login-card-main {
+      width: 100%;
+      max-width: 450px;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.38);
+      border-top: 5px solid var(--sakti-gold);
+    }
+    .login-card-header {
+      background: linear-gradient(135deg, var(--sakti-navy-deep) 0%, var(--sakti-navy) 65%, var(--sakti-blue) 100%);
+      color: #ffffff;
+      padding: 22px 24px 18px;
+      text-align: center;
+      border-bottom: 2px solid var(--sakti-gold);
+    }
+    .login-logo-circle {
+      width: 66px;
+      height: 66px;
+      margin: 0 auto 10px;
+      background: #ffffff;
+      border: 2.5px solid var(--sakti-gold);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    .login-logo-circle img {
+      max-width: 50px;
+      max-height: 50px;
+      object-fit: contain;
+    }
+    .login-satker-tag {
+      display: inline-block;
+      background: var(--sakti-gold);
+      color: var(--sakti-navy-deep);
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 2px 9px;
+      border-radius: 4px;
+      letter-spacing: 0.4px;
+      margin-bottom: 6px;
+    }
+    .login-card-header h1 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+    }
+    .login-card-header p {
+      margin: 4px 0 0;
+      font-size: 11.5px;
+      color: #dbeafe;
+    }
+    .login-card-body {
+      padding: 22px 24px 20px;
+    }
+    .login-footer-note {
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 11.5px;
+      padding-top: 8px;
+    }
+    .login-footer-note strong {
+      color: var(--sakti-gold);
+    }
+
+    /* TOPBAR */
+    .sakti-topbar {
+      background: linear-gradient(90deg, var(--sakti-navy-deep) 0%, var(--sakti-navy) 55%, var(--sakti-blue) 100%);
+      color: #ffffff;
+      padding: 8px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 3px solid var(--sakti-gold);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 2px 6px rgba(6, 24, 41, 0.22);
+    }
+
+    .sakti-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .btn-mobile-drawer {
+      display: none;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      border-radius: 5px;
+      padding: 6px 10px;
+      font-size: 16px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .sakti-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      padding: 4px;
+      background: #ffffff;
+      border: 1.5px solid var(--sakti-gold);
+      border-radius: 7px;
+      flex-shrink: 0;
+    }
+    .sakti-logos img { max-height: 32px; max-width: 32px; object-fit: contain; }
+
+    .sakti-appname {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+    .sakti-appname h1 {
+      margin: 0;
+      font-size: 17.5px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: 0.6px;
+      color: #ffffff;
+    }
+    .sakti-badge-ver {
+      display: inline-block;
+      background: var(--sakti-gold);
+      color: var(--sakti-navy-deep);
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.25;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .sakti-userbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sakti-satker-pill {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      color: #f8fafc;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    .sakti-status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      padding: 5px 11px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .sakti-status-chip.admin { background: #dcfce7; border-color: #86efac; color: #166534; }
+    .sakti-status-chip.operator { background: #fef9c3; border-color: #fde047; color: #854d0e; }
+    .sakti-status-chip.viewer { background: #e0f2fe; border-color: #7dd3fc; color: #075985; }
+
+    .btn-sakti-pass {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 4px;
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-sakti-pass:hover { background: rgba(255, 255, 255, 0.26); }
+
+    .btn-sakti-logout {
+      background: #dc2626;
+      color: #fff;
+      border: 0;
+      border-radius: 4px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-sakti-logout:hover { background: #b91c1c; }
+
+    /* MENU BAR MODUL */
+    .sakti-menubar {
+      background: var(--sakti-navy);
+      padding: 0 16px;
+      display: flex;
+      align-items: stretch;
+      gap: 2px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-bottom: 2px solid var(--sakti-blue-mid);
+    }
+    .sakti-mod-btn {
+      background: transparent;
+      border: 0;
+      color: rgba(255, 255, 255, 0.88);
+      padding: 10px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .sakti-mod-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+    .sakti-mod-btn.active {
+      background: #ffffff;
+      color: var(--sakti-navy);
+      font-weight: 700;
+      border-bottom-color: var(--sakti-gold);
+    }
+    .sakti-lock-pill {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: var(--sakti-gold);
+      color: var(--sakti-navy-deep);
+      font-weight: 800;
+    }
+
+    /* LAYOUT SHELL & SIDEBAR */
+    .sakti-shell { display: flex; flex: 1; position: relative; }
+
+    .sakti-sidebar {
+      width: 268px;
+      background: var(--sakti-navy);
+      color: #e2e8f0;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--sakti-navy-deep);
+      z-index: 35;
+    }
+
+    .sakti-side-title {
+      padding: 11px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: var(--sakti-gold);
+      background: rgba(0, 0, 0, 0.22);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-close-drawer {
+      display: none;
+      background: none;
+      border: 0;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .sakti-side-body { padding: 12px; flex: 1; }
+
+    .side-search-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .side-search-card label {
+      display: block;
+      font-size: 11.5px;
+      color: #e2e8f0;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .side-search-card input,
+    .side-search-card select {
+      width: 100%;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      padding: 8px 10px;
+      background: #ffffff;
+      color: #0f172a;
+      font: inherit;
+      margin-bottom: 8px;
+    }
+    .side-search-btns { display: flex; gap: 6px; margin-top: 4px; }
+    .side-search-btns button {
+      flex: 1;
+      border: 0;
+      border-radius: 4px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-find { background: var(--sakti-gold); color: var(--sakti-navy-deep); }
+    .btn-clear { background: rgba(255, 255, 255, 0.16); color: #ffffff; }
+
+    .sakti-tree-group {
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .sakti-tree-header {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 8px 11px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #93c5fd;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .sakti-tree-list button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      border: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: transparent;
+      color: #e2e8f0;
+      text-align: left;
+      padding: 9px 12px;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+    .sakti-tree-list button:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .sakti-tree-list button.active {
+      background: var(--sakti-blue-mid);
+      color: #ffffff;
+      font-weight: 700;
+      border-left: 4px solid var(--sakti-gold);
+    }
+
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 24, 41, 0.55);
+      z-index: 30;
+    }
+    .drawer-backdrop.show { display: block; }
+
+    /* MAIN AREA */
+    .sakti-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    .sakti-breadcrumb {
+      background: #ffffff;
+      border-bottom: 1px solid var(--sakti-border);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .sakti-breadcrumb h2 { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--sakti-navy); }
+    .sakti-breadcrumb .crumb-path { font-size: 11.5px; color: var(--sakti-muted); }
+
+    .sakti-content { padding: 16px 20px; flex: 1; }
+
+    /* KARTU & KPI */
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 12px; }
+    .grid-2-import { display: grid; grid-template-columns: repeat(2, minmax(320px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--sakti-surface);
+      border: 1px solid var(--sakti-border);
+      border-top: 3px solid var(--sakti-blue);
+      border-radius: 6px;
+      padding: 15px 17px;
+      box-shadow: 0 1px 2px rgba(10, 37, 64, 0.04);
+    }
+    .panel { margin-top: 14px; }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--sakti-border);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .card-head h3 { margin: 0; font-size: 14.5px; font-weight: 700; color: var(--sakti-navy); }
+    .metric { font-size: 22px; font-weight: 800; margin-top: 5px; color: var(--sakti-blue); }
+    .metric.green { color: var(--sakti-green); }
+    .metric.red { color: var(--sakti-red); }
+    .label { font-size: 11px; color: var(--sakti-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+    .muted { color: var(--sakti-muted); font-size: 12px; }
+
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .field { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 170px; margin-bottom: 10px; }
+    label { font-size: 12px; color: #334155; font-weight: 600; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 8px 10px;
+      background: #fff;
+      font: inherit;
+      color: #0f172a;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--sakti-blue);
+      box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.14);
+    }
+
+    button.primary {
+      background: var(--sakti-blue);
+      color: #fff;
+      border: 0;
+      border-radius: 4px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+    button.primary:hover { background: var(--sakti-navy); }
+    button.primary:disabled, button.gold-btn:disabled, button.success-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    button.secondary {
+      background: #f1f5f9;
+      color: var(--sakti-navy);
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+    button.secondary:hover { background: #e2e8f0; }
+    button.success-btn {
+      background: #0f766e;
+      color: #fff;
+      border: 0;
+      border-radius: 4px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12.5px;
+    }
+    button.gold-btn {
+      background: var(--sakti-gold);
+      color: var(--sakti-navy-deep);
+      border: 1px solid #d97706;
+      border-radius: 4px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12.5px;
+    }
+    button.gold-btn:hover { filter: brightness(0.96); }
+
+    /* PANEL IMPORT / COPAS MONITORING GAJI (ADMIN & OPERATOR) */
+    .mon-import-panel {
+      margin-top: 14px;
+      border: 1.5px solid #cbd5e1;
+      border-top: 4px solid #0f766e;
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 15px 17px;
+    }
+    .mon-import-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .mon-import-head h4 {
+      margin: 0;
+      font-size: 14.5px;
+      color: var(--sakti-navy);
+    }
+    .role-scope-tag {
+      background: var(--sakti-navy);
+      color: var(--sakti-gold);
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.4px;
+    }
+    .import-mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .import-mode-tab {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: var(--sakti-navy);
+      padding: 7px 14px;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .import-mode-tab.active {
+      background: var(--sakti-navy);
+      color: #ffffff;
+      border-color: var(--sakti-navy);
+    }
+    .copas-textarea {
+      width: 100%;
+      min-height: 150px;
+      font-family: 'Consolas', 'SF Mono', 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      background: #ffffff;
+      border: 1.5px dashed #64748b;
+      border-radius: 6px;
+      padding: 10px 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .copas-textarea:focus {
+      border-style: solid;
+      border-color: var(--sakti-blue);
+    }
+
+    /* PANEL IMPORT EXCEL POLRI & PNS TERPISAH */
+    .excel-dropzone {
+      border: 2px dashed #94a3b8;
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 20px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .excel-dropzone:hover, .excel-dropzone.dragover {
+      border-color: var(--sakti-blue);
+      background: #eff6ff;
+    }
+    .excel-col-pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      background: var(--sakti-navy);
+      color: var(--sakti-gold);
+    }
+    .excel-period-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    .excel-period-chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #e0f2fe;
+      color: #075985;
+      border: 1px solid #bae6fd;
+    }
+    .excel-check-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 5px;
+      font-size: 12px;
+      line-height: 1.45;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+    }
+    .excel-check-box.ok {
+      background: var(--sakti-green-bg);
+      border-color: #86efac;
+      color: #166534;
+    }
+    .excel-check-box.err {
+      background: var(--sakti-red-bg);
+      border-color: #fca5a5;
+      color: #991b1b;
+    }
+
+    /* PANEL PETIKAN GAJI (ADMIN & OPERATOR) */
+    .petikan-panel {
+      margin-top: 14px;
+      border: 1.5px solid #93c5fd;
+      border-top: 4px solid var(--sakti-navy);
+      background: #f8fbff;
+      border-radius: 6px;
+      padding: 15px 17px;
+    }
+    .petikan-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid #dbeafe;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+    .petikan-panel-head h4 {
+      margin: 0;
+      font-size: 14.5px;
+      color: var(--sakti-navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .petikan-badge-rule {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .petikan-badge-rule.bpjs { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .petikan-badge-rule.mou { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+    .petikan-badge-rule.nonmou { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+    /* PRINT PREVIEW A4 PORTRAIT PERSIS TEMPLATE PETIKAN GAJI (A1:K47) */
+    .petikan-preview-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 6px 6px 0 0;
+      margin-top: 14px;
+      border-bottom: 2px solid var(--sakti-gold);
+    }
+    .petikan-preview-bar .spec-tag {
+      font-size: 11.5px;
+      color: #fde68a;
+      font-weight: 700;
+    }
+    .petikan-sheet-wrap {
+      background: #64748b;
+      padding: 20px 12px;
+      border-radius: 0 0 6px 6px;
+      overflow-x: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .petikan-paper {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      color: #000000;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 10.5pt;
+      line-height: 1.24;
+      padding: 10mm 12mm;
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+    .petikan-paper:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    .petikan-printarea-frame {
+      width: 100%;
+      min-height: 274mm;
+      border: 1px dashed #94a3b8;
+      padding: 6mm 8mm;
+      position: relative;
+      overflow: hidden;
+    }
+    .petikan-area-badge {
+      position: absolute;
+      top: 2px;
+      right: 6px;
+      font-family: Arial, sans-serif;
+      font-size: 8px;
+      color: #64748b;
+      letter-spacing: 0.4px;
+      z-index: 4;
+    }
+
+    /* WATERMARK TIPIS DI SELURUH HALAMAN (ANTI-PENYALAHGUNAAN) */
+    .petikan-watermark-overlay {
+      position: absolute;
+      inset: -35%;
+      width: 170%;
+      height: 170%;
+      transform: rotate(-28deg);
+      display: flex;
+      flex-wrap: wrap;
+      align-content: center;
+      justify-content: center;
+      gap: 24px 36px;
+      pointer-events: none;
+      user-select: none;
+      z-index: 3;
+    }
+    .petikan-watermark-overlay span {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14.5pt;
+      font-weight: 800;
+      letter-spacing: 2px;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .petikan-watermark-overlay.wm-bpjs span { color: rgba(21, 128, 61, 0.085); }
+    .petikan-watermark-overlay.wm-mou span { color: rgba(13, 71, 161, 0.085); }
+    .petikan-watermark-overlay.wm-nonmou span { color: rgba(185, 28, 28, 0.085); }
+
+    .petikan-inner { position: relative; z-index: 2; }
+    .petikan-kop {
+      display: inline-block;
+      text-align: center;
+      font-weight: bold;
+      font-size: 10pt;
+      line-height: 1.22;
+      border-bottom: 1.5px solid #000;
+      padding-bottom: 3px;
+      margin-bottom: 6px;
+    }
+    .petikan-title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 12pt;
+      text-decoration: underline;
+      margin: 2px 0 8px;
+      letter-spacing: 0.4px;
+    }
+    .petikan-ident-wrap {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+    .petikan-ident {
+      width: 62%;
+      border-collapse: collapse;
+    }
+    .petikan-ident td {
+      border: 0 !important;
+      background: transparent !important;
+      padding: 1.5px 3px;
+      font-size: 10pt;
+      white-space: normal;
+      color: #000 !important;
+      font-weight: bold;
+    }
+    .petikan-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 6px;
+    }
+    .petikan-tbl td, .petikan-tbl th {
+      border: 1px solid #000 !important;
+      background: transparent !important;
+      padding: 2.6px 5px;
+      font-size: 9.8pt;
+      color: #000 !important;
+      white-space: normal;
+    }
+    .petikan-tbl tr.sec-row td {
+      font-weight: bold;
+      border-left: 1px solid #000 !important;
+      border-right: 1px solid #000 !important;
+      padding-top: 5px;
+      padding-bottom: 3px;
+    }
+    .petikan-tbl tr.tot-row td {
+      font-weight: bold;
+    }
+    .petikan-tbl td.col-no {
+      width: 28px;
+      text-align: center;
+    }
+    .petikan-tbl td.rp-label {
+      width: 26px;
+      text-align: center;
+      border-right: 0 !important;
+    }
+    .petikan-tbl td.rp-val {
+      width: 108px;
+      text-align: right;
+      border-left: 0 !important;
+      font-variant-numeric: tabular-nums;
+    }
+    .petikan-tbl td.tot-rp-label {
+      width: 26px;
+      text-align: center;
+      border-right: 0 !important;
+      font-weight: bold;
+    }
+    .petikan-tbl td.tot-rp-val {
+      width: 118px;
+      text-align: right;
+      border-left: 0 !important;
+      font-variant-numeric: tabular-nums;
+      font-weight: bold;
+    }
+    .petikan-terbilang-box {
+      border: 1px solid #000;
+      padding: 5px 8px;
+      margin: 6px 0;
+      font-size: 9.8pt;
+    }
+    .petikan-nb-box {
+      margin-top: 5px;
+      font-size: 9.5pt;
+      line-height: 1.28;
+    }
+    .petikan-ttd-wrap {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .petikan-ttd-box {
+      width: 270px;
+      text-align: center;
+      font-size: 10pt;
+      line-height: 1.24;
+    }
+    .petikan-ttd-tgl {
+      text-align: left;
+      padding-left: 18px;
+      margin-bottom: 3px;
+      white-space: pre-wrap;
+    }
+    .petikan-ttd-space {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .petikan-ttd-space img {
+      max-height: 66px;
+      max-width: 190px;
+      object-fit: contain;
+    }
+
+    /* KARTU RINCIAN TERPADU GAJI + POTONGAN + TUNKIN */
+    .terpadu-kartu {
+      border: 1px solid var(--sakti-border);
+      border-left: 4px solid var(--sakti-navy);
+      border-radius: 8px;
+      background: #f8fbff;
+      padding: 14px 16px;
+      margin: 14px 0;
+    }
+    .terpadu-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #dce6f1;
+      padding-bottom: 10px;
+    }
+    .terpadu-nama { font-size: 16px; font-weight: 800; color: var(--sakti-navy); }
+    .terpadu-sub { font-size: 12px; color: var(--sakti-muted); margin-top: 2px; }
+    .terpadu-ringkas-box {
+      background: var(--sakti-navy);
+      color: #ffffff;
+      border-radius: 6px;
+      padding: 8px 14px;
+      text-align: right;
+      border-bottom: 3px solid var(--sakti-gold);
+    }
+    .terpadu-ringkas-box small { display: block; font-size: 10px; color: var(--sakti-gold); font-weight: 700; letter-spacing: 0.4px; }
+    .terpadu-ringkas-box b { font-size: 19px; }
+
+    .terpadu-cols {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .sub-box {
+      background: #ffffff;
+      border: 1px solid var(--sakti-border);
+      border-radius: 6px;
+      padding: 11px 12px;
+    }
+    .sub-box-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--sakti-navy);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px dashed #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+    }
+    .rincian-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+      gap: 6px;
+    }
+    .rincian-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 6px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+    }
+    .rincian-item span { color: #475569; }
+    .rincian-item b { font-family: 'Consolas', monospace; color: #0f172a; }
+    .rincian-item.pot b { color: var(--sakti-red); }
+    .rincian-item.bersih { background: var(--sakti-green-bg); border-color: #bbf7d0; }
+    .rincian-item.bersih b { color: var(--sakti-green); font-size: 12.5px; }
+
+    /* TABEL */
+    .tablewrap {
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 68vh;
+      margin-top: 8px;
+      border: 1px solid var(--sakti-border);
+      border-radius: 6px;
+      background: #ffffff;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      font-size: 12px;
+      background: #ffffff;
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--sakti-border);
+      border-right: 1px solid #edf2f7;
+      text-align: left;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    th:last-child, td:last-child { border-right: none; }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--sakti-navy);
+      color: #ffffff;
+      font-weight: 700;
+      border-bottom: 2px solid var(--sakti-gold);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      z-index: 10;
+    }
+    tbody tr:nth-child(even) td { background-color: #f8fafc; }
+    tbody tr:nth-child(odd) td { background-color: #ffffff; }
+    tbody tr:hover td { background-color: #e0f2fe !important; color: #0c4a6e; }
+
+    .num-col {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-family: 'Consolas', 'SF Mono', 'Courier New', monospace;
+    }
+    .pot-col { color: var(--sakti-red); font-weight: 600; }
+    .net-col { color: var(--sakti-green); font-weight: 700; background-color: #f0fdf4 !important; }
+
+    .table-scroll-hint {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #334155;
+      margin-top: 8px;
+      padding: 5px 10px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      border-left: 3px solid var(--sakti-gold);
+    }
+
+    .hidden { display: none !important; }
+    .notice {
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+      background: #e0f2fe;
+      border-left: 4px solid var(--sakti-blue);
+      color: #075985;
+      font-weight: 500;
+    }
+    .error { background: var(--sakti-red-bg); border-left-color: #dc2626; color: #991b1b; }
+    .success { background: var(--sakti-green-bg); border-left-color: #16a34a; color: #166534; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+
+    .summary-strip {
+      background: #f8fafc;
+      border: 1px solid var(--sakti-border);
+      border-radius: 4px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      font-weight: 600;
+      color: var(--sakti-navy);
+    }
+
+    .lock-card { text-align: center; padding: 40px 22px; max-width: 540px; margin: 20px auto; }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 24, 41, 0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 16px;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 6px;
+      width: 100%;
+      max-width: 430px;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    .modal-head {
+      background: var(--sakti-navy);
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--sakti-gold);
+    }
+    .modal-body { padding: 18px; }
+
+    .sakti-footer {
+      background: var(--sakti-navy);
+      color: #cbd5e1;
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 11.5px;
+      border-top: 2px solid var(--sakti-gold);
+    }
+    .sakti-footer strong { color: var(--sakti-gold); }
+
+    @media (max-width: 991.98px) {
+      .btn-mobile-drawer { display: inline-flex; align-items: center; justify-content: center; }
+      .btn-close-drawer { display: inline-flex; align-items: center; justify-content: center; }
+      .sakti-satker-pill { display: none; }
+      .sakti-sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.22s ease;
+        box-shadow: 4px 0 18px rgba(0, 0, 0, 0.35);
+      }
+      .sakti-sidebar.open { transform: translateX(0); }
+      .terpadu-cols, .grid-2-import { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sakti-topbar { padding: 8px 12px; }
+      .sakti-appname h1 { font-size: 15.5px; }
+      .sakti-badge-ver { font-size: 9px; padding: 2px 6px; }
+      .sakti-menubar { padding: 0 8px; }
+      .sakti-mod-btn { padding: 9px 11px; font-size: 12px; }
+      .grid-4 { grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 8px; }
+      .sakti-content { padding: 12px 10px; }
+      .card { padding: 13px 11px; }
+      .table-scroll-hint { display: flex; }
+      .rincian-grid { grid-template-columns: 1fr; }
+      .terpadu-ringkas-box { width: 100%; text-align: left; }
+      .actions button { flex: 1 1 calc(50% - 6px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= HALAMAN LOGIN PERTAMA (TAMPIL SEBELUM SITUS DIAKSES) ================= -->
+  <div id="loginPageScreen" class="login-screen">
+    <div class="login-center-wrap">
+      <div class="login-card-main">
+        <div class="login-card-header">
+          <div class="login-logo-circle">
+            <img src="https://drive.google.com/thumbnail?id=1Z-3fhgw94F-Geg4rwQX4zd6KzVyMRpmz" alt="Logo Keuangan Polri" referrerpolicy="no-referrer"
+                 onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/1Z-3fhgw94F-Geg4rwQX4zd6KzVyMRpmz';}else{this.style.display='none';}">
+          </div>
+          <span class="login-satker-tag">SATKER 644690 &bull; POLRES TABANAN</span>
+          <h1>ARISTANA</h1>
+          <p>Administrasi Keuangan Terintegrasi Polres Tabanan</p>
+        </div>
+
+        <div class="login-card-body">
+          <div id="loginMsg" class="notice error hidden"></div>
+
+          <form onsubmit="submitLoginForm(event)">
+            <div class="field">
+              <label for="loginUsername">Username (NRP / NIP atau Username Petugas)</label>
+              <input id="loginUsername" type="text" placeholder="Masukkan NRP / NIP atau username..." autocomplete="username" required>
+            </div>
+            <div class="field">
+              <label for="loginPassword">Password</label>
+              <input id="loginPassword" type="password" placeholder="Masukkan password..." autocomplete="current-password" required>
+            </div>
+            <div style="margin-top:16px;">
+              <button type="submit" class="primary" id="btnLoginSubmit" style="width:100%;padding:10px 14px;font-size:13.5px;">
+                Masuk ke Sistem ARISTANA
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-footer-note">
+      <strong>ARISTANA - ADMINISTRASI KEUANGAN TERINTEGRASI POLRES TABANAN</strong> &bull; Dikembangkan oleh <strong>Brigpol Indra Aristana SiKeu Polres Tabanan</strong>
+    </div>
+  </div>
+
+  <!-- ================= APLIKASI UTAMA (MUNCUL SETELAH LOGIN BERHASIL) ================= -->
+  <div id="appMainShell" class="hidden">
+
+    <header class="sakti-topbar">
+      <div class="sakti-brand">
+        <button type="button" class="btn-mobile-drawer" onclick="toggleDrawer()" aria-label="Buka Menu">☰</button>
+        <div class="sakti-logos">
+          <img src="https://drive.google.com/thumbnail?id=1Z-3fhgw94F-Geg4rwQX4zd6KzVyMRpmz" alt="Logo Keuangan Polri" referrerpolicy="no-referrer"
+               onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/1Z-3fhgw94F-Geg4rwQX4zd6KzVyMRpmz';}else{this.style.display='none';}">
+        </div>
+        <div class="sakti-appname">
+          <h1>ARISTANA</h1>
+          <span class="sakti-badge-ver">ADMINISTRASI KEUANGAN TERINTEGRASI POLRES TABANAN</span>
+        </div>
+      </div>
+
+      <div class="sakti-userbar">
+        <span class="sakti-satker-pill">SATKER 644690 &bull; TABANAN</span>
+        <span id="roleBadge" class="sakti-status-chip">Belum Login</span>
+        <button type="button" id="btnChangePass" class="btn-sakti-pass" onclick="openChangePassModal()">🔑 Ubah Password</button>
+        <button type="button" id="btnDoLogout" class="btn-sakti-logout" onclick="logoutSession()">Keluar</button>
+      </div>
+    </header>
+
+    <!-- MENU BAR MODUL (PERMINTAAN TUNKIN & SPPD HANYA TAMPIL UNTUK ADMIN / OPERATOR) -->
+    <nav class="sakti-menubar">
+      <button type="button" class="sakti-mod-btn active" id="tab-mon-terpadu" onclick="switchTopMenu('mon-terpadu')">
+        📊 Monitoring Gaji &amp; Tunkin
+      </button>
+      <button type="button" class="sakti-mod-btn hidden" id="tab-req-tunkin" onclick="switchTopMenu('req-tunkin')">
+        🧮 Permintaan Tunkin <span class="sakti-lock-pill">ADMIN / OP</span>
+      </button>
+      <button type="button" class="sakti-mod-btn hidden" id="tab-sppd" onclick="switchTopMenu('sppd')">
+        ✈️ Pembuatan SPPD <span class="sakti-lock-pill">ADMIN / OP</span>
+      </button>
+    </nav>
+
+    <div id="drawerBackdrop" class="drawer-backdrop" onclick="closeDrawer()"></div>
+
+    <div class="sakti-shell">
+      <aside id="saktiSidebar" class="sakti-sidebar">
+        <div class="sakti-side-title">
+          <span id="sideHeading">FILTER JENIS PERSONEL</span>
+          <button type="button" onclick="closeDrawer()" class="btn-close-drawer" aria-label="Tutup Menu">✕</button>
+        </div>
+        <div class="sakti-side-body" id="sideDynamicArea"></div>
+      </aside>
+
+      <div class="sakti-main">
+        <div class="sakti-breadcrumb">
+          <div>
+            <h2 id="pageTitle">Monitoring Terpadu Gaji, Tunkin &amp; Potongan</h2>
+            <div class="crumb-path" id="subTitle">Beranda / Monitoring Gaji &amp; Tunkin</div>
+          </div>
+          <div class="muted" id="userInfo">—</div>
+        </div>
+
+        <div class="sakti-content">
+          <div id="message" class="notice hidden"></div>
+          <datalist id="availablePeriodsList"></datalist>
+
+          <!-- 1. MENU TERPADU: MONITORING GAJI + TUNKIN + POTONGAN -->
+          <section id="terpadu" class="view-section">
+            <div class="card">
+              <div class="card-head">
+                <h3>Monitoring Terpadu Gaji, Tunkin &amp; Seluruh Potongan Personel</h3>
+                <span class="muted" id="terpaduSearchInfo">Pilih periode lalu tampilkan atau cari nama / NRP / NIP.</span>
+              </div>
+
+              <div class="row">
+                <div class="field" style="max-width:210px;">
+                  <label for="viewPeriod">Periode Bulan (YYYY-MM)</label>
+                  <input id="viewPeriod" type="month" list="availablePeriodsList" onchange="loadTerpadu()">
+                </div>
+                <div class="field" style="max-width:340px;">
+                  <label for="terpaduSearchInput">Cari Nama / NRP / NIP</label>
+                  <input id="terpaduSearchInput" type="text" placeholder="Ketik nama atau NRP/NIP…" oninput="syncKeywordFromMain(this.value)" onkeydown="if(event.key==='Enter')loadTerpadu()">
+                </div>
+                <div class="field" style="justify-content:end;max-width:240px;">
+                  <div class="actions" style="margin-bottom:0;">
+                    <button type="button" class="primary" onclick="loadTerpadu()">Muat Data</button>
+                    <button type="button" class="secondary" onclick="resetTerpaduSearch()">Reset</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-4" style="margin-top:8px;">
+                <div class="card" style="padding:12px 14px;">
+                  <div class="label">Total Gaji Bersih</div>
+                  <div class="metric" id="sumGajiBersih" style="font-size:18px;">Rp 0</div>
+                </div>
+                <div class="card" style="padding:12px 14px;">
+                  <div class="label">Total Tunkin Bersih</div>
+                  <div class="metric" id="sumTunkinBersih" style="font-size:18px;">Rp 0</div>
+                </div>
+                <div class="card" style="padding:12px 14px;">
+                  <div class="label">Total Potongan (Gaji + Tunkin)</div>
+                  <div class="metric red" id="sumTotalPotongan" style="font-size:18px;">Rp 0</div>
+                </div>
+                <div class="card" style="padding:12px 14px;">
+                  <div class="label">Total Diterima (Gaji + Tunkin)</div>
+                  <div class="metric green" id="sumTotalTerima" style="font-size:18px;">Rp 0</div>
+                </div>
+              </div>
+
+              <!-- AKSI KHUSUS ADMIN & OPERATOR DI DALAM MENU MONITORING (TERSEMBUNYI BAGI VIEWER) -->
+              <div class="actions hidden" id="adminOperatorMonBar" style="margin-top:14px;">
+                <button type="button" class="success-btn" onclick="toggleImportMonitoringPanel()">
+                  📥 Import / Copas Data Monitoring Gaji (Admin &amp; Operator)
+                </button>
+                <button type="button" class="gold-btn" onclick="togglePetikanGajiPanel()">
+                  📄 Buat Petikan Gaji (BPJS / Kredit Bank / Rincian Gaji)
+                </button>
+              </div>
+
+              <!-- PANEL IMPORT / COPAS LANGSUNG MONITORING GAJI (KHUSUS ADMIN & OPERATOR) -->
+              <div id="importMonitoringPanel" class="mon-import-panel hidden">
+                <div class="mon-import-head">
+                  <h4>📥 Import / Copy-Paste Data Monitoring Gaji Multi-Periode</h4>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span class="role-scope-tag">KHUSUS ADMIN &amp; OPERATOR</span>
+                    <button type="button" class="secondary" onclick="toggleImportMonitoringPanel(false)">Tutup Panel</button>
+                  </div>
+                </div>
+
+                <div class="notice" style="margin-bottom:10px;font-size:12px;">
+                  <strong>Data Lama Tetap Aman Tersimpan:</strong> Setiap baris dilengkapi kolom <code>PERIODE DATA</code>. Saat mengimpor bulan baru, data monitoring gaji periode bulan sebelumnya <strong>tidak dihapus</strong>.
+                </div>
+
+                <div id="monGajiPeriodsInfo" class="excel-period-badges" style="margin-bottom:10px;"></div>
+
+                <div class="row">
+                  <div class="field" style="max-width:210px;">
+                    <label for="monImpPeriode">Periode Bulan Tujuan (YYYY-MM) *</label>
+                    <input id="monImpPeriode" type="month" list="availablePeriodsList">
+                  </div>
+                  <div class="field" style="max-width:340px;">
+                    <label for="monImpMode">Mode Penulisan untuk Periode Tersebut</label>
+                    <select id="monImpMode">
+                      <option value="REPLACE_MONTH">Perbarui Data Bulan Ini (Data Bulan Lain Tetap Tersimpan)</option>
+                      <option value="APPEND">Tambahkan ke Bulan Ini (Susulan / Tambahan)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="import-mode-tabs">
+                  <button type="button" class="import-mode-tab active" id="tabMonModeCopas" onclick="switchMonImportMode('COPAS')">
+                    📋 Copy-Paste Langsung dari Excel
+                  </button>
+                  <button type="button" class="import-mode-tab" id="tabMonModeFile" onclick="switchMonImportMode('FILE')">
+                    📂 Upload File Excel / CSV (.xlsx / .xls / .csv)
+                  </button>
+                </div>
+
+                <!-- MODE 1: COPAS LANGSUNG -->
+                <div id="monModeCopasBox">
+                  <label for="monCopasText">Tempel (Ctrl+V) Tabel Monitoring Gaji dari Excel di Bawah Ini (17 Kolom atau 18 Kolom, dengan/tanpa Header):</label>
+                  <textarea id="monCopasText" class="copas-textarea" placeholder="Blok baris data Monitoring Gaji pada Excel Anda (NO, NRP, NAMA, PANGKAT, GAJI MANDAT, BRI, KOPERASI, BTN, BWS, SUKA-DUKA, PURA/ISLAM, POLSEK, POT LAIN, PMI, POLWAN, JML POTONGAN, BAYAR) lalu tekan Ctrl+V di sini..." oninput="previewMonCopasText()"></textarea>
+                  <div id="monCopasStatus" class="excel-check-box hidden"></div>
+                  <div class="actions" style="margin-top:10px;">
+                    <button type="button" class="success-btn" id="btnExecMonCopas" disabled onclick="submitMonCopasImport()">Proses Simpan Data Copas Monitoring Gaji</button>
+                    <button type="button" class="secondary" onclick="resetMonCopasImport()">Bersihkan</button>
+                  </div>
+                </div>
+
+                <!-- MODE 2: UPLOAD FILE EXCEL -->
+                <div id="monModeFileBox" class="hidden">
+                  <div class="excel-dropzone" id="dropMonFile" onclick="$('fileMonGaji').click()">
+                    <div style="font-size:26px;margin-bottom:4px;">📊</div>
+                    <div><strong>Klik untuk memilih file Excel Monitoring Gaji</strong> atau seret file ke sini</div>
+                    <div class="muted" style="margin-top:4px;">Format didukung: .xlsx, .xls, .csv</div>
+                    <input type="file" id="fileMonGaji" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleMonFileSelect(this.files[0])">
+                  </div>
+                  <div id="monFileStatus" class="excel-check-box hidden"></div>
+                  <div class="actions" style="margin-top:10px;">
+                    <button type="button" class="success-btn" id="btnExecMonFile" disabled onclick="submitMonFileImport()">Proses Import File Monitoring Gaji</button>
+                    <button type="button" class="secondary" onclick="resetMonFileImport()">Reset File</button>
+                  </div>
+                </div>
+
+                <div id="monImportPreviewWrap" class="hidden" style="margin-top:10px;">
+                  <div style="font-size:12px;font-weight:700;color:var(--sakti-navy);margin-bottom:5px;">Pratinjau 5 Baris Pertama Data Monitoring Gaji:</div>
+                  <div class="tablewrap" style="max-height:210px;">
+                    <table id="monImportPreviewTable"></table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- FORM PEMBUATAN PETIKAN GAJI (KHUSUS ADMIN & OPERATOR) -->
+              <div id="petikanGajiPanel" class="petikan-panel hidden">
+                <div class="petikan-panel-head">
+                  <h4>📄 Pembuatan Daftar Petikan Gaji Otomatis (Template Resmi A1:K47 · A4 Portrait)</h4>
+                  <button type="button" class="secondary" onclick="togglePetikanGajiPanel(false)">Tutup Form</button>
+                </div>
+
+                <div class="row">
+                  <div class="field" style="max-width:250px;">
+                    <label for="pgSearchInput">NRP / NIP atau Nama Personel *</label>
+                    <input id="pgSearchInput" type="text" placeholder="Ketik NRP/NIP atau Nama..." onkeydown="if(event.key==='Enter')loadPetikanGajiPreview()">
+                  </div>
+                  <div class="field" style="max-width:250px;">
+                    <label for="pgKeperluan">Pengaturan Keperluan &amp; Tanda Tangan *</label>
+                    <select id="pgKeperluan" onchange="onPetikanKeperluanChange()">
+                      <option value="BPJS">1. BPJS (TTD Scan Kasikeu)</option>
+                      <option value="KREDIT_MOU">2. KREDIT BANK (TTD Basah Kasikeu)</option>
+                      <option value="KREDIT_NON_MOU">3. RINCIAN GAJI (Tanpa TTD Kasikeu)</option>
+                    </select>
+                  </div>
+                  <div class="field" style="max-width:200px;">
+                    <label for="pgModeBulan">Pilihan Cetak Bulan *</label>
+                    <select id="pgModeBulan" onchange="onPetikanModeBulanChange()">
+                      <option value="1_BULAN">1 Bulan Tertentu</option>
+                      <option value="3_BULAN">3 Bulan Terakhir (Sekaligus 3 Slip)</option>
+                    </select>
+                  </div>
+                  <div class="field" style="max-width:175px;">
+                    <label id="lblPgPeriode" for="pgPeriode">Bulan Acuan (YYYY-MM)</label>
+                    <input id="pgPeriode" type="month" list="availablePeriodsList">
+                  </div>
+                  <div class="field" style="max-width:175px;">
+                    <label for="pgTglCetak">Tgl/Bulan Dibuat Surat *</label>
+                    <input id="pgTglCetak" type="date" onchange="if(currentPetikanPayload) loadPetikanGajiPreview()">
+                  </div>
+                  <div class="field" style="justify-content:end;max-width:200px;">
+                    <button type="button" class="primary" id="btnLoadPetikan" onclick="loadPetikanGajiPreview()">Generate &amp; Print Preview</button>
+                  </div>
+                </div>
+
+                <div class="row" style="align-items:flex-end;">
+                  <div class="field" style="max-width:240px;">
+                    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:4px;">
+                      <input type="checkbox" id="pgUseNb" checked onchange="renderPetikanGajiSheet()" style="width:auto;">
+                      Tampilkan Catatan (NB)
+                    </label>
+                    <select id="pgNbPreset" onchange="applyNbPreset()">
+                      <option value="AUTO">Otomatis Sesuai Keperluan</option>
+                      <option value="BPJS">NB Pengurusan BPJS</option>
+                      <option value="KREDIT_MOU">NB Kredit Bank</option>
+                      <option value="KREDIT_NON_MOU">NB Rincian Gaji (Non-MoU)</option>
+                      <option value="CUSTOM">Tulis NB Manual...</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="pgNbText">Isi Teks NB (Tercetak di bawah Terbilang)</label>
+                    <input id="pgNbText" type="text" oninput="renderPetikanGajiSheet()" placeholder="Catatan NB akan tercetak di bawah Terbilang...">
+                  </div>
+                </div>
+
+                <div id="pgRuleBadge" class="petikan-badge-rule bpjs">
+                  ✓ Watermark Full-Page: BPJS | Tanda Tangan Scan Kasikeu otomatis dipasang.
+                </div>
+
+                <!-- PRINT PREVIEW AREA (A1:K47 · PORTRAIT · KERTAS A4) -->
+                <div id="petikanPreviewArea" class="hidden">
+                  <div class="petikan-preview-bar">
+                    <div>
+                      <strong>🖨️ PRINT PREVIEW PETIKAN GAJI</strong>
+                      <div class="spec-tag" id="pgPreviewInfo">Print Area: A1:K47 &bull; Orientasi: Portrait &bull; Ukuran Kertas: A4 (210 × 297 mm)</div>
+                    </div>
+                    <div class="actions" style="margin-bottom:0;">
+                      <button type="button" class="success-btn" id="btnTransferSheetPetikan" onclick="transferPetikanToSheet()">📊 Transfer ke Template Spreadsheet</button>
+                      <button type="button" class="gold-btn" onclick="printPetikanGaji()">🖨️ Cetak / Simpan PDF (A4 Portrait)</button>
+                    </div>
+                  </div>
+                  <div class="petikan-sheet-wrap" id="petikanSheetsContainer"></div>
+                </div>
+              </div>
+
+              <div id="cekKartu"></div>
+
+              <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat rincian Gaji, Potongan Gaji, Tunkin &amp; Potongan Tunkin</span></div>
+              <div class="tablewrap">
+                <table id="terpaduTable">
+                  <thead>
+                    <tr>
+                      <th>NRP/NIP</th>
+                      <th>Nama</th>
+                      <th>Pangkat</th>
+                      <th>Jenis</th>
+                      <th>Grade</th>
+                      <th>Gaji Mandat</th>
+                      <th>Pot. Gaji</th>
+                      <th>Gaji Bersih</th>
+                      <th>Tunkin Bruto</th>
+                      <th>Pajak Tunkin</th>
+                      <th>Kurang Sakit/Izin</th>
+                      <th>Bayar Tunkin</th>
+                      <th>Pot. Koperasi</th>
+                      <th>Pot. Letting</th>
+                      <th>Pot. Polwan</th>
+                      <th>Pot. Lain Tunkin</th>
+                      <th>Total Pot. Tunkin</th>
+                      <th>Sisa Tunkin</th>
+                      <th>Total Diterima</th>
+                    </tr>
+                  </thead>
+                  <tbody id="terpaduRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. PERMINTAAN TUNKIN (ADMIN / OPERATOR) -->
+          <section id="lock-req-tunkin" class="view-section hidden">
+            <div class="card lock-card">
+              <div style="font-size:38px;margin-bottom:10px;">🔒</div>
+              <h3 style="margin:0 0 8px;color:var(--sakti-navy);">Otorisasi Diperlukan: Modul Permintaan Tunkin</h3>
+              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. Akun personel (Viewer) memiliki akses penuh pada menu Monitoring Gaji &amp; Tunkin.</p>
+            </div>
+          </section>
+
+          <section id="dashboard" class="view-section hidden">
+            <div class="grid-4">
+              <div class="card"><div class="label">Personel Terdaftar</div><div class="metric" id="total">—</div></div>
+              <div class="card"><div class="label">Personel Aktif</div><div class="metric" id="aktif">—</div></div>
+              <div class="card"><div class="label">POLRI Aktif</div><div class="metric" id="polri">—</div></div>
+              <div class="card"><div class="label">PNS / PPPK Aktif</div><div class="metric" id="pns">—</div></div>
+            </div>
+            <div class="card panel">
+              <div class="card-head">
+                <h3>Periode Kerja, Snapshot TUNKIN, Sinkron, Backup &amp; Pencairan</h3>
+              </div>
+              <div class="row">
+                <div class="field" style="max-width:250px;"><label for="periodDash">Periode (YYYY-MM)</label><input id="periodDash" type="month" list="availablePeriodsList"></div>
+                <div class="field" style="justify-content:end;max-width:220px;"><button type="button" class="primary" id="createSnapshotBtn" onclick="createTunkin()">Buat Snapshot TUNKIN</button></div>
+              </div>
+              <div class="actions" id="suratActionWrap" style="margin-top:6px;">
+                <button type="button" class="primary" id="buatSuratBtn" onclick="buatSuratTunkin()">Buat Surat Pengantar Pencairan (Docs)</button>
+                <button type="button" class="success-btn" onclick="buatRekapPencairan()">Buat Rekap Pencairan Bank (4 Sheet Otomatis)</button>
+                <button type="button" class="gold-btn" onclick="openMonitoringImportShortcut()">📋 Import / Copas Monitoring Gaji</button>
+                <button type="button" class="gold-btn" onclick="showSubSection('import-excel')">📥 Import Excel Gaji (POLRI &amp; PNS)</button>
+                <button type="button" class="secondary" onclick="arsipkanGajiBulanIni()">💾 Arsipkan Monitoring Gaji Bulan Ini</button>
+                <button type="button" class="secondary" onclick="sinkronPotongan()">Sinkronkan Potongan Koperasi &amp; Tetap</button>
+                <button type="button" class="secondary" onclick="backupArsip()">Backup Arsip Data</button>
+              </div>
+              <div class="muted">Snapshot membekukan perhitungan bulan berjalan tanpa menghapus data bulan sebelumnya; import Excel/Monitoring Gaji, arsip gaji, sinkronisasi &amp; backup tersedia untuk Admin/Operator.</div>
+            </div>
+          </section>
+
+          <!-- SUB-MENU: IMPORT FILE EXCEL POLRI & PNS TERPISAH & MULTI-PERIODE -->
+          <section id="import-excel" class="view-section hidden">
+            <div class="notice">
+              <strong>Import File Excel Data Gaji Multi-Periode (POLRI &amp; PNS Terpisah):</strong>
+              Pilih <strong>Periode Bulan (YYYY-MM)</strong> sebelum mengimpor. Sistem menyimpan setiap bulan secara terpisah menggunakan kolom <code>PERIODE_DATA</code>, sehingga <strong>data bulan-bulan sebelumnya tetap aman tersimpan</strong> dan tidak tertimpa.
+            </div>
+
+            <div class="grid-2-import">
+              <!-- PANEL 1: IMPORT EXCEL POLRI -->
+              <div class="card">
+                <div class="card-head">
+                  <h3>1. Import Excel Gaji POLRI (Sheet: POLRI)</h3>
+                  <span class="excel-col-pill" id="badgeColsPolri">- Kolom</span>
+                </div>
+                <div class="muted" id="infoSheetPolri" style="margin-bottom:6px;">Memeriksa struktur kolom sheet POLRI...</div>
+                <div class="excel-period-badges" id="periodsBadgesPolri"></div>
+
+                <div class="row">
+                  <div class="field">
+                    <label for="periodImportPolri">Periode Bulan Tujuan Import (YYYY-MM) *</label>
+                    <input type="month" id="periodImportPolri" list="availablePeriodsList">
+                  </div>
+                  <div class="field">
+                    <label for="modeImportPolri">Mode Penulisan untuk Bulan Tersebut</label>
+                    <select id="modeImportPolri">
+                      <option value="REPLACE_MONTH">Perbarui Data Bulan Ini (Bulan Lain Tetap Aman)</option>
+                      <option value="APPEND">Tambahkan ke Bulan Ini (Susulan / Tambahan)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="excel-dropzone" id="dropPolri" onclick="$('fileImportPolri').click()">
+                  <div style="font-size:26px;margin-bottom:4px;">📂</div>
+                  <div><strong>Klik untuk memilih file Excel POLRI</strong> atau seret file ke sini</div>
+                  <div class="muted" style="margin-top:4px;">Format didukung: .xlsx, .xls, .csv</div>
+                  <input type="file" id="fileImportPolri" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelSelect('POLRI', this.files[0])">
+                </div>
+
+                <div id="statusImportPolri" class="excel-check-box hidden"></div>
+
+                <div class="actions" style="margin-top:10px;">
+                  <button type="button" class="primary" id="btnExecImportPolri" disabled onclick="executeExcelImport('POLRI')">Proses Import Data POLRI</button>
+                  <button type="button" class="secondary" onclick="resetImportBox('POLRI')">Reset</button>
+                </div>
+
+                <div id="previewWrapPolri" class="hidden" style="margin-top:12px;">
+                  <div style="font-size:12px;font-weight:700;color:var(--sakti-navy);margin-bottom:6px;">Pratinjau 5 Baris Pertama File POLRI:</div>
+                  <div class="tablewrap" style="max-height:220px;">
+                    <table id="previewTablePolri"></table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PANEL 2: IMPORT EXCEL PNS -->
+              <div class="card">
+                <div class="card-head">
+                  <h3>2. Import Excel Gaji PNS (Sheet: PNS)</h3>
+                  <span class="excel-col-pill" id="badgeColsPns">- Kolom</span>
+                </div>
+                <div class="muted" id="infoSheetPns" style="margin-bottom:6px;">Memeriksa struktur kolom sheet PNS...</div>
+                <div class="excel-period-badges" id="periodsBadgesPns"></div>
+
+                <div class="row">
+                  <div class="field">
+                    <label for="periodImportPns">Periode Bulan Tujuan Import (YYYY-MM) *</label>
+                    <input type="month" id="periodImportPns" list="availablePeriodsList">
+                  </div>
+                  <div class="field">
+                    <label for="modeImportPns">Mode Penulisan untuk Bulan Tersebut</label>
+                    <select id="modeImportPns">
+                      <option value="REPLACE_MONTH">Perbarui Data Bulan Ini (Bulan Lain Tetap Aman)</option>
+                      <option value="APPEND">Tambahkan ke Bulan Ini (Susulan / Tambahan)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="excel-dropzone" id="dropPns" onclick="$('fileImportPns').click()">
+                  <div style="font-size:26px;margin-bottom:4px;">📂</div>
+                  <div><strong>Klik untuk memilih file Excel PNS</strong> atau seret file ke sini</div>
+                  <div class="muted" style="margin-top:4px;">Format didukung: .xlsx, .xls, .csv</div>
+                  <input type="file" id="fileImportPns" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelSelect('PNS', this.files[0])">
+                </div>
+
+                <div id="statusImportPns" class="excel-check-box hidden"></div>
+
+                <div class="actions" style="margin-top:10px;">
+                  <button type="button" class="gold-btn" id="btnExecImportPns" disabled onclick="executeExcelImport('PNS')">Proses Import Data PNS</button>
+                  <button type="button" class="secondary" onclick="resetImportBox('PNS')">Reset</button>
+                </div>
+
+                <div id="previewWrapPns" class="hidden" style="margin-top:12px;">
+                  <div style="font-size:12px;font-weight:700;color:var(--sakti-navy);margin-bottom:6px;">Pratinjau 5 Baris Pertama File PNS:</div>
+                  <div class="tablewrap" style="max-height:220px;">
+                    <table id="previewTablePns"></table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="personel" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>Database Personel Polres Tabanan</h3>
+                <span class="muted" id="peopleSearchInfo">Masukkan nama atau NRP untuk mencari personel.</span>
+              </div>
+              <div class="row">
+                <div class="field"><label for="search">Cari Personel (Nama atau NRP/NIP)</label><input id="search" placeholder="Ketik nama atau NRP…" oninput="schedulePeopleSearch()" onkeydown="if(event.key==='Enter'){clearPeopleSearchTimer();loadPeople();}"></div>
+                <div class="field" style="justify-content:end;max-width:250px;">
+                  <div class="actions">
+                    <button type="button" class="secondary" onclick="clearPeopleSearch()">Reset</button>
+                    <button type="button" class="primary" onclick="loadPeople()">Muat Ulang</button>
+                  </div>
+                </div>
+              </div>
+              <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat rincian jabatan &amp; tombol aksi</span></div>
+              <div class="tablewrap">
+                <table id="personelTable">
+                  <thead><tr><th>NRP/NIP</th><th>Nama</th><th>Pangkat</th><th>Jabatan</th><th>Grade</th><th>Jenis</th><th>Aksi</th></tr></thead>
+                  <tbody id="peopleRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="form" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3 id="formHeading">Tambah Personel Baru</h3>
+              </div>
+              <div class="row">
+                <div class="field"><label for="nama">Nama Lengkap *</label><input id="nama"></div>
+                <div class="field"><label for="nrp">NRP / NIP *</label><input id="nrp"></div>
+                <div class="field"><label for="jenis">Jenis Personel *</label><select id="jenis" onchange="autoFillRankInfo()"><option>POLRI UMUM</option><option>POLRI TIPIKOR</option><option>PNS</option><option>PPPK</option></select></div>
+                <div class="field"><label for="pangkat">Pangkat</label><input id="pangkat" placeholder="Contoh: AKP" oninput="autoFillRankInfo()"></div>
+                <div class="field"><label for="jabatan">Jabatan *</label><input id="jabatan"></div>
+                <div class="field"><label for="grade">Grade TUNKIN</label><input id="grade" type="number" min="1" max="20"></div>
+                <div class="field"><label for="gol">Golongan / Pangkat</label><input id="gol" placeholder="Otomatis untuk pangkat POLRI"></div>
+                <div class="field"><label for="rekening">Nomor Rekening BNI</label><input id="rekening"></div>
+              </div>
+              <div class="actions">
+                <button type="button" class="primary" id="savePersonBtn" onclick="savePerson()">Simpan Personel Baru</button>
+                <button type="button" class="secondary" onclick="resetForm()">Bersihkan Form</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="status" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>Status Keaktifan Personel (Mutasi, Pensiun, Susulan)</h3>
+              </div>
+              <div class="row">
+                <div class="field"><label for="stNrp">NRP/NIP *</label><input id="stNrp"></div>
+                <div class="field"><label for="stStatus">Status *</label><select id="stStatus"><option>MUTASI</option><option>PENSIUN</option><option>SUSULAN</option><option>DUMMY</option><option>AKTIF</option></select></div>
+                <div class="field"><label for="stTanggal">Tanggal Efektif *</label><input id="stTanggal" type="date"></div>
+                <div class="field"><label for="stAlasan">Alasan / Tujuan Mutasi *</label><input id="stAlasan"></div>
+              </div>
+              <button type="button" class="primary" onclick="saveStatus()">Simpan Status Personel</button>
+            </div>
+          </section>
+
+          <section id="potongan" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>Input Transaksi Potongan / Pengurangan Tunkin</h3>
+              </div>
+              <div class="row">
+                <div class="field"><label for="dPeriode">Periode *</label><input id="dPeriode" type="month" list="availablePeriodsList"></div>
+                <div class="field"><label for="dNrp">NRP/NIP *</label><input id="dNrp"></div>
+                <div class="field"><label for="dJenis">Jenis Transaksi *</label><select id="dJenis"><option>KOPERASI</option><option>LETTING</option><option>POLWAN</option><option>LAINNYA</option><option>PENGURANGAN/SAKIT/IJIN</option></select></div>
+                <div class="field"><label for="dNominal">Nominal (Rp) *</label><input id="dNominal" type="number" min="0"></div>
+                <div class="field"><label for="dKet">Keterangan</label><input id="dKet"></div>
+              </div>
+              <div class="actions">
+                <button type="button" class="primary" onclick="saveDeduction()">Simpan Sekali (Periode Ini)</button>
+                <button type="button" class="success-btn" onclick="savePotonganTetap()">Simpan Potongan Tetap (Berulang Tiap Bulan)</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="riwayat" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>Riwayat Perubahan Data</h3>
+                <button type="button" class="secondary" onclick="loadHistory()">Muat Ulang Riwayat</button>
+              </div>
+              <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat detail riwayat lengkap</span></div>
+              <div class="tablewrap">
+                <table id="riwayatTable">
+                  <thead><tr><th>Waktu</th><th>NRP/NIP</th><th>Nama</th><th>Pangkat Lama</th><th>Pangkat Baru</th><th>Detail Lama</th><th>Detail Baru</th><th>Pengguna</th></tr></thead>
+                  <tbody id="historyRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="kelola-akun" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>Manajemen Akun Login User &amp; Personel (Sheet: APP_AUTH)</h3>
+                <button type="button" class="gold-btn" id="btnSyncAllUsers" onclick="syncPersonnelAccounts()">🔄 Sinkronkan Semua Personel ke APP_AUTH</button>
+              </div>
+              <div class="row">
+                <div class="field"><label for="accUser">Username / NRP / NIP *</label><input id="accUser"></div>
+                <div class="field"><label for="accPass">Password *</label><input id="accPass"></div>
+                <div class="field"><label for="accNama">Nama User / Personel *</label><input id="accNama"></div>
+                <div class="field"><label for="accRole">Role *</label><select id="accRole"><option value="VIEWER">VIEWER (Personel)</option><option value="OPERATOR">OPERATOR</option><option value="ADMIN">ADMIN</option></select></div>
+                <div class="field"><label for="accAktif">Status</label><select id="accAktif"><option value="YA">AKTIF</option><option value="TIDAK">NONAKTIF</option></select></div>
+              </div>
+              <div class="actions">
+                <button type="button" class="primary" onclick="saveNewAuthAccount()">Simpan / Perbarui Akun</button>
+                <input id="accSearchInput" type="text" placeholder="Cari NRP / Nama / Role akun…" style="max-width:280px;" oninput="filterAuthAccountsTable()">
+              </div>
+              <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat daftar akun &amp; tombol aksi</span></div>
+              <div class="tablewrap">
+                <table id="akunTable">
+                  <thead><tr><th>Username / NRP</th><th>Password</th><th>Nama</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead>
+                  <tbody id="authAccountRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. PEMBUATAN SPPD -->
+          <section id="lock-sppd" class="view-section hidden">
+            <div class="card lock-card">
+              <div style="font-size:38px;margin-bottom:10px;">🔒</div>
+              <h3 style="margin:0 0 8px;color:var(--sakti-navy);">Otorisasi Diperlukan: Modul Pembuatan SPPD</h3>
+              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. Akun personel (Viewer) memiliki akses penuh pada menu Monitoring Gaji &amp; Tunkin.</p>
+            </div>
+          </section>
+
+          <section id="sppd-form" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>1. Pilih Anggota SiKeu yang Berangkat (Pelaksana &amp; Pengikut)</h3>
+                <button class="secondary" type="button" onclick="toggleQuickAddPersonil()">+ Tambah Anggota SiKeu Baru</button>
+              </div>
+
+              <div id="quickAddPersonilBox" class="hidden" style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:5px;padding:12px;margin-bottom:14px;">
+                <strong style="display:block;margin-bottom:8px;color:var(--sakti-navy);">Tambah Anggota SiKeu Baru</strong>
+                <div class="row">
+                  <div class="field"><label for="qPersNama">Nama Lengkap *</label><input id="qPersNama" placeholder="Nama lengkap anggota"></div>
+                  <div class="field"><label for="qPersPangkat">Pangkat *</label><input id="qPersPangkat" placeholder="Contoh: BRIPKA"></div>
+                  <div class="field"><label for="qPersNrp">NRP *</label><input id="qPersNrp" placeholder="8 digit NRP"></div>
+                  <div class="field"><label for="qPersJabatan">Jabatan *</label><input id="qPersJabatan" placeholder="Jabatan pada unit kerja"></div>
+                </div>
+                <div class="actions" style="margin-bottom:0;">
+                  <button class="success-btn" type="button" onclick="saveQuickSppdPerson()">Simpan &amp; Pilih Anggota</button>
+                  <button class="secondary" type="button" onclick="toggleQuickAddPersonil()">Batal</button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="field"><label for="sppdPick1">Pilih Anggota SiKeu #1 (Utama) *</label><select id="sppdPick1" onchange="applyPickedPerson(1)"></select></div>
+                <div class="field"><label for="sppdPick2">Pilih Anggota SiKeu #2 (Pengikut — Opsional)</label><select id="sppdPick2" onchange="applyPickedPerson(2)"></select></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="sppdP1Nama">Nama Anggota #1 *</label><input id="sppdP1Nama"></div>
+                <div class="field"><label for="sppdP1Pangkat">Pangkat #1 *</label><input id="sppdP1Pangkat"></div>
+                <div class="field"><label for="sppdP1Nrp">NRP #1 *</label><input id="sppdP1Nrp"></div>
+                <div class="field"><label for="sppdP1Jabatan">Jabatan #1</label><input id="sppdP1Jabatan"></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="sppdP2Nama">Nama Anggota #2</label><input id="sppdP2Nama" oninput="hitungEstimasiSppd()"></div>
+                <div class="field"><label for="sppdP2Pangkat">Pangkat #2</label><input id="sppdP2Pangkat"></div>
+                <div class="field"><label for="sppdP2Nrp">NRP #2</label><input id="sppdP2Nrp"></div>
+                <div class="field"><label for="sppdP2Jabatan">Jabatan #2</label><input id="sppdP2Jabatan"></div>
+              </div>
+              <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer;">
+                <input type="checkbox" id="sppdSavePersonUpdate" checked style="width:auto;">
+                Simpan otomatis jika ada pembaruan pangkat/jabatan anggota SiKeu
+              </label>
+            </div>
+
+            <div class="card panel">
+              <div class="card-head">
+                <h3>2. Kegiatan, Kemana, Kapan &amp; Berapa Lama (Otomatis Hitung)</h3>
+                <span class="muted">Menghasilkan Sprin (Google Docs) + SPD &amp; Nominatif (Google Sheets)</span>
+              </div>
+              <div class="row">
+                <div class="field"><label for="sppdNoSprin">Nomor Sprin (Otomatis)</label><input id="sppdNoSprin"></div>
+                <div class="field"><label for="sppdNoSpd">Nomor SPD (Otomatis)</label><input id="sppdNoSpd"></div>
+                <div class="field" style="max-width:140px;"><label for="sppdAkun">Akun</label><input id="sppdAkun" value="524111"></div>
+                <div class="field" style="max-width:190px;"><label for="sppdUangHarian">Uang Harian / Hari (Rp)</label><input id="sppdUangHarian" type="number" value="190000" oninput="hitungEstimasiSppd()"></div>
+              </div>
+              <div class="field">
+                <label for="sppdKegiatan">Maksud Perjalanan Dinas / Kegiatan Apa *</label>
+                <input id="sppdKegiatan" placeholder="Uraian maksud perjalanan dinas">
+              </div>
+              <div class="row">
+                <div class="field"><label for="sppdTempatTujuan">Kemana — Tempat Tujuan *</label><input id="sppdTempatTujuan" placeholder="Lokasi / instansi tujuan"></div>
+                <div class="field"><label for="sppdTempatBerangkat">Tempat Berangkat</label><input id="sppdTempatBerangkat" value="Polres Tabanan, Jl. Pahlawan No. 12 Tabanan"></div>
+                <div class="field" style="max-width:160px;"><label for="sppdAlatAngkut">Alat Angkut</label><input id="sppdAlatAngkut" value="Darat"></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="sppdTglBerangkat">Kapan — Tanggal Berangkat *</label><input id="sppdTglBerangkat" type="date" onchange="syncSppdHari()"></div>
+                <div class="field"><label for="sppdTglKembali">Kapan — Tanggal Kembali *</label><input id="sppdTglKembali" type="date" onchange="syncSppdHari()"></div>
+                <div class="field" style="max-width:150px;"><label for="sppdLamaHari">Berapa Lama (Hari)</label><input id="sppdLamaHari" type="number" min="1" value="1" oninput="hitungEstimasiSppd()"></div>
+                <div class="field"><label for="sppdTglSprin">Tanggal Tanda Tangan Sprin</label><input id="sppdTglSprin" type="date"></div>
+              </div>
+              <div class="field">
+                <label for="sppdDasar">Dasar Sprin (Satu poin per baris)</label>
+                <textarea id="sppdDasar" rows="3"></textarea>
+              </div>
+
+              <div class="summary-strip">
+                <span id="sppdCalcSummary">Estimasi Biaya: 1 Personil × 1 Hari × Rp 190.000 = Rp 190.000</span>
+                <button type="button" class="primary" onclick="generateSppdDoc()">Generate Otomatis Sprin (Docs) &amp; SPD/Nominatif (Sheets)</button>
+              </div>
+            </div>
+
+            <div class="card panel">
+              <div class="card-head">
+                <h3>3. Pejabat Penandatangan (Kapolres / PPK / Kasikeu / Pemotong)</h3>
+                <button type="button" class="secondary" onclick="savePejabatForm()">Simpan Perubahan Pejabat</button>
+              </div>
+              <div class="row">
+                <div class="field"><label for="pejKapolresJab">Jabatan Kapolres</label><input id="pejKapolresJab" value="KAPOLRES TABANAN"></div>
+                <div class="field"><label for="pejKapolresNama">Nama Kapolres</label><input id="pejKapolresNama"></div>
+                <div class="field"><label for="pejKapolresPangkat">Pangkat</label><input id="pejKapolresPangkat"></div>
+                <div class="field"><label for="pejKapolresNrp">NRP</label><input id="pejKapolresNrp"></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="pejPpkJab">Jabatan PPK</label><input id="pejPpkJab" value="PEJABAT PEMBUAT KOMITMEN"></div>
+                <div class="field"><label for="pejPpkNama">Nama PPK</label><input id="pejPpkNama"></div>
+                <div class="field"><label for="pejPpkPangkat">Pangkat</label><input id="pejPpkPangkat"></div>
+                <div class="field"><label for="pejPpkNrp">NRP</label><input id="pejPpkNrp"></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="pejKasikeuJab">Jabatan Kasikeu</label><input id="pejKasikeuJab" value="KEPALA SEKSI KEUANGAN"></div>
+                <div class="field"><label for="pejKasikeuNama">Nama Kasikeu</label><input id="pejKasikeuNama"></div>
+                <div class="field"><label for="pejKasikeuPangkat">Pangkat</label><input id="pejKasikeuPangkat"></div>
+                <div class="field"><label for="pejKasikeuNrp">NRP</label><input id="pejKasikeuNrp"></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="pejPemotongJab">Jabatan Pemotong</label><input id="pejPemotongJab" value="Pejabat Yang Melakukan Pemotongan"></div>
+                <div class="field"><label for="pejPemotongNama">Nama Pemotong</label><input id="pejPemotongNama"></div>
+                <div class="field"><label for="pejPemotongPangkat">Pangkat</label><input id="pejPemotongPangkat"></div>
+                <div class="field"><label for="pejPemotongNrp">NRP</label><input id="pejPemotongNrp"></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="sppd-pejabat" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>Master Anggota SiKeu &amp; Update Pangkat / Jabatan</h3>
+              </div>
+              <div class="row">
+                <div class="field"><label for="mPersNama">Nama Anggota *</label><input id="mPersNama"></div>
+                <div class="field"><label for="mPersPangkat">Pangkat Terbaru *</label><input id="mPersPangkat"></div>
+                <div class="field"><label for="mPersNrp">NRP *</label><input id="mPersNrp"></div>
+                <div class="field"><label for="mPersJabatan">Jabatan</label><input id="mPersJabatan"></div>
+              </div>
+              <button type="button" class="primary" onclick="saveMasterSppdPerson()">Simpan / Update Anggota SiKeu</button>
+              <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat jabatan &amp; tombol edit</span></div>
+              <div class="tablewrap">
+                <table id="sppdMasterTable">
+                  <thead><tr><th>No</th><th>Nama</th><th>Pangkat</th><th>NRP</th><th>Jabatan</th><th>Aksi</th></tr></thead>
+                  <tbody id="sppdMasterRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="sppd-riwayat" class="view-section hidden">
+            <div class="card">
+              <div class="card-head">
+                <h3>Riwayat Pembuatan Sprin (Docs) &amp; SPD / Nominatif (Sheets)</h3>
+              </div>
+              <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat link dokumen Docs &amp; Sheets</span></div>
+              <div class="tablewrap">
+                <table id="sppdLogTable">
+                  <thead>
+                    <tr><th>Waktu</th><th>No Sprin</th><th>No SPD</th><th>Personil 1</th><th>Personil 2</th><th>Kegiatan</th><th>Berangkat</th><th>Kembali</th><th>Tujuan</th><th>Total Biaya</th><th>Sprin (Docs)</th><th>SPD &amp; Nominatif (Sheets)</th></tr>
+                  </thead>
+                  <tbody id="sppdLogRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <footer class="sakti-footer">
+      <strong>ARISTANA - ADMINISTRASI KEUANGAN TERINTEGRASI POLRES TABANAN</strong> · Dikembangkan oleh <strong>Brigpol Indra Aristana SiKeu Polres Tabanan</strong>
+    </footer>
+  </div>
+
+  <!-- MODAL UBAH PASSWORD MANDIRI (SEMUA USER: PERSONEL / OPERATOR / ADMIN) -->
+  <div id="changePasswordModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong>🔑 Ubah Password Akun Saya</strong>
+        <button type="button" onclick="closeChangePassModal()" style="background:none;border:0;color:#fff;font-size:18px;cursor:pointer;">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="changePassMsg" class="notice error hidden"></div>
+        <div class="muted" id="changePassUserLabel" style="margin-bottom:12px;"></div>
+        <form onsubmit="submitChangePasswordForm(event)">
+          <div class="field">
+            <label for="oldPassInput">Password Lama *</label>
+            <input id="oldPassInput" type="password" placeholder="Masukkan password saat ini..." required>
+          </div>
+          <div class="field">
+            <label for="newPassInput">Password Baru (Minimal 4 Karakter) *</label>
+            <input id="newPassInput" type="password" minlength="4" placeholder="Masukkan password baru..." required>
+          </div>
+          <div class="field">
+            <label for="confirmPassInput">Konfirmasi Password Baru *</label>
+            <input id="confirmPassInput" type="password" minlength="4" placeholder="Ulangi password baru..." required>
+          </div>
+          <div class="actions" style="margin-top:14px;margin-bottom:0;">
+            <button type="submit" class="primary" id="btnSubmitChangePass" style="flex:1;">Simpan Password Baru</button>
+            <button type="button" class="secondary" onclick="closeChangePassModal()">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let authToken = sessionStorage.getItem('aristana_token') || '';
+let appPermissions = { canView: false, canWrite: false, canManageUsers: false, readOnly: true };
+let currentUserInfo = null;
+let currentTopTab = 'mon-terpadu';
+let terpaduCache = [];
+let sppdPeopleCache = [];
+let authAccountsCache = [];
+let currentPetikanPayload = null;
+let importSheetMeta = { polri: null, pns: null, defaultPeriod: '' };
+let parsedExcelImport = { POLRI: null, PNS: null };
+let parsedMonFileImport = null;
+
+const POLRI_RANKS_CLIENT = {
+  'BRIPDA': { gol: 'II/A', grade: 5 },
+  'BRIPTU': { gol: 'II/B', grade: 5 },
+  'BRIGPOL': { gol: 'II/C', grade: 6 },
+  'BRIGADIR': { gol: 'II/C', grade: 6 },
+  'BRIPKA': { gol: 'II/D', grade: 6 },
+  'AIPDA': { gol: 'II/E', grade: 7 },
+  'AIPTU': { gol: 'II/F', grade: 7 },
+  'IPDA': { gol: 'III/A', grade: 8 },
+  'IPTU': { gol: 'III/B', grade: 8 },
+  'AKP': { gol: 'III/C', grade: 9 },
+  'KOMPOL': { gol: 'IV/A', grade: 10 },
+  'AKBP': { gol: 'IV/B', grade: 11 },
+  'KOMBES POL': { gol: 'IV/C', grade: 12 }
+};
+
+const NB_TEMPLATES = {
+  BPJS: 'Petikan gaji ini diterbitkan khusus untuk keperluan administrasi pengurusan BPJS Kesehatan dan tidak dapat digunakan untuk pengajuan kredit bank.',
+  KREDIT_MOU: 'Petikan gaji ini diterbitkan khusus untuk keperluan persyaratan pengajuan kredit pada Bank yang telah memiliki Perjanjian Kerja Sama (MoU) dengan Polres Tabanan.',
+  KREDIT_NON_MOU: 'Rincian gaji ini diterbitkan sebagai informasi penghasilan personel dan tidak memerlukan pengesahan tanda tangan Kasikeu.'
+};
+
+const SUB_GROUPS = {
+  'req-tunkin': [
+    {
+      group: 'Proses Tunkin, Import & Pencairan',
+      items: [
+        { id: 'dashboard', label: '▦ Dashboard, Snapshot & Pencairan', title: 'Dashboard, Snapshot, Sinkron, Backup & Pencairan Tunkin', crumb: 'Permintaan Tunkin / Proses Bulanan / Snapshot & Pencairan' },
+        { id: 'import-excel', label: '📥 Import Excel POLRI & PNS', title: 'Import Data Gaji Excel Multi-Periode (POLRI & PNS Terpisah)', crumb: 'Permintaan Tunkin / Proses Bulanan / Import Excel POLRI & PNS' },
+        { id: 'potongan', label: '− Input Potongan & Tetap', title: 'Input Potongan & Pengurangan Tunkin', crumb: 'Permintaan Tunkin / Proses Bulanan / Potongan' }
+      ]
+    },
+    {
+      group: 'Referensi & Data Personel',
+      items: [
+        { id: 'personel', label: '♙ Database Personel', title: 'Database Personel Polres Tabanan', crumb: 'Permintaan Tunkin / Referensi / Database Personel' },
+        { id: 'form', label: '＋ Tambah / Edit Personel', title: 'Formulir Tambah / Ubah Personel', crumb: 'Permintaan Tunkin / Referensi / Tambah Personel' },
+        { id: 'status', label: '⇄ Mutasi / Pensiun', title: 'Pengaturan Status Mutasi & Pensiun', crumb: 'Permintaan Tunkin / Referensi / Status Keaktifan' }
+      ]
+    },
+    {
+      group: 'Audit & Administrasi',
+      items: [
+        { id: 'riwayat', label: '◷ Riwayat Perubahan', title: 'Log Audit Perubahan Data', crumb: 'Permintaan Tunkin / Audit / Riwayat Perubahan' },
+        { id: 'kelola-akun', label: '🔑 Kelola Akun Login & User', title: 'Manajemen Akun Login Personel, Operator & Admin', crumb: 'Permintaan Tunkin / Administrasi / Akun Login', adminOnly: true }
+      ]
+    }
+  ],
+  'sppd': [
+    {
+      group: 'Transaksi Perjalanan Dinas',
+      items: [
+        { id: 'sppd-form', label: '✈️ Form Sprin & SPPD', title: 'Pembuatan Otomatis Sprin (Docs) & SPD/Nominatif (Sheets)', crumb: 'Pembuatan SPPD / Transaksi / Form Sprin & SPPD' },
+        { id: 'sppd-riwayat', label: '📄 Riwayat & Arsip SPPD', title: 'Daftar Dokumen Sprin & SPPD', crumb: 'Pembuatan SPPD / Transaksi / Riwayat SPPD' }
+      ]
+    },
+    {
+      group: 'Referensi Anggota SiKeu & Pejabat',
+      items: [
+        { id: 'sppd-pejabat', label: '🎖️ Master Anggota SiKeu & Pangkat', title: 'Tambah / Update Pangkat Anggota SiKeu & Pejabat', crumb: 'Pembuatan SPPD / Referensi / Master Anggota SiKeu' }
+      ]
+    }
+  ]
+};
+
+function showLoginPageOnly() {
+  $('loginPageScreen').classList.remove('hidden');
+  $('appMainShell').classList.add('hidden');
+  if ($('loginUsername')) $('loginUsername').focus();
+}
+
+function showMainAppOnly() {
+  $('loginPageScreen').classList.add('hidden');
+  $('appMainShell').classList.remove('hidden');
+}
+
+function toggleDrawer() {
+  if (!appPermissions.canView) return;
+  $('saktiSidebar').classList.toggle('open');
+  $('drawerBackdrop').classList.toggle('show');
+}
+function closeDrawer() {
+  $('saktiSidebar').classList.remove('open');
+  $('drawerBackdrop').classList.remove('show');
+}
+
+function msg(t, kind = 'notice') {
+  const e = $('message');
+  e.textContent = t;
+  e.className = 'notice ' + kind;
+  e.classList.remove('hidden');
+}
+function hideMsg() { $('message').classList.add('hidden'); }
+function fail(e) { msg(e && e.message ? e.message : String(e), 'error'); }
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzpMH5PSK94Er0AZL_hQTryW3EOWG-J2AnTT_eDo4c7jwclPqAKHlVDQ0MxHNZmq9cH/exec';
+
+async function runGasApi(fn, fullArgs) {
+  const res = await fetch(GAS_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action: fn,
+      args: fullArgs || [],
+      token: authToken
+    })
+  });
+  const rawText = await res.text();
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (e) {
+    throw new Error('Respons server tidak valid. Pastikan Web App GAS sudah di-deploy ulang dengan doPost(e) & akses Anyone.');
+  }
+  if (!parsed || parsed.ok === false) {
+    throw new Error((parsed && parsed.error) || 'Permintaan ke backend Google Apps Script gagal.');
+  }
+  return parsed.data;
+}
+
+function call(fn, args, done, onErr) {
+  runGasApi(fn, [...(args || []), authToken])
+    .then(data => {
+      if (typeof done === 'function') done(data);
+    })
+    .catch(err => {
+      if (typeof onErr === 'function') onErr(err);
+      fail(err);
+    });
+}
+
+function parseMoneyVal(val, isScaledThousand = false) {
+  if (val === null || val === undefined || val === '') return 0;
+  let num = 0;
+  if (typeof val === 'number') {
+    num = isNaN(val) ? 0 : val;
+  } else {
+    let s = String(val).trim().replace(/Rp/gi, '').replace(/\s+/g, '');
+    if (s.includes(',') && s.includes('.')) {
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else if (s.includes(',')) {
+      const parts = s.split(',');
+      if (parts.length === 2 && parts[1].length === 3 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])) {
+        s = parts[0] + parts[1];
+      } else {
+        s = s.replace(',', '.');
+      }
+    } else if (/^\d{1,3}(\.\d{3})+$/.test(s)) {
+      s = s.replace(/\./g, '');
+    }
+    num = parseFloat(s.replace(/[^0-9.-]/g, ''));
+    if (isNaN(num)) num = 0;
+    if (isScaledThousand && num > 0 && num < 1000) {
+      num = Math.round(num * 1000);
+    }
+  }
+  return Math.round(num);
+}
+
+function formatMoney(val, isScaledThousand = false) {
+  return parseMoneyVal(val, isScaledThousand).toLocaleString('id-ID');
+}
+
+function normalizeTerpaduItem(raw) {
+  const item = Object.assign({}, raw || {});
+  const pgRaw = item.rincianPotGaji || {};
+
+  item.gajiMandat = parseMoneyVal(item.gajiMandat, false);
+  item.potonganGaji = parseMoneyVal(item.potonganGaji, false);
+
+  const selisihGaji = Math.max(0, item.gajiMandat - item.potonganGaji);
+  let gajiBersih = (item.gajiBersih !== undefined && item.gajiBersih !== null && item.gajiBersih !== '')
+    ? parseMoneyVal(item.gajiBersih, false)
+    : selisihGaji;
+
+  if (selisihGaji >= 10000 && gajiBersih < Math.floor(selisihGaji / 10)) {
+    gajiBersih = selisihGaji;
+  }
+  item.gajiBersih = gajiBersih;
+
+  item.tunkinBruto = parseMoneyVal(item.tunkinBruto, false);
+  item.pajakTunkin = parseMoneyVal(item.pajakTunkin, false);
+  item.kurangAbsen = parseMoneyVal(item.kurangAbsen, false);
+  item.bayarTunkin = (item.bayarTunkin !== undefined && item.bayarTunkin !== null && item.bayarTunkin !== '')
+    ? parseMoneyVal(item.bayarTunkin, false)
+    : Math.max(0, item.tunkinBruto - item.pajakTunkin - item.kurangAbsen);
+
+  item.potKop = parseMoneyVal(item.potKop, false);
+  item.potLet = parseMoneyVal(item.potLet, false);
+  item.potPol = parseMoneyVal(item.potPol, false);
+  item.potLainTunkin = parseMoneyVal(item.potLainTunkin, false);
+
+  item.totalPotTunkin = (item.totalPotTunkin !== undefined && item.totalPotTunkin !== null && item.totalPotTunkin !== '')
+    ? parseMoneyVal(item.totalPotTunkin, false)
+    : (item.potKop + item.potLet + item.potPol + item.potLainTunkin);
+
+  item.sisaTunkin = (item.sisaTunkin !== undefined && item.sisaTunkin !== null && item.sisaTunkin !== '')
+    ? parseMoneyVal(item.sisaTunkin, false)
+    : Math.max(0, item.bayarTunkin - item.totalPotTunkin);
+
+  item.totalPotGabungan = item.potonganGaji + item.pajakTunkin + item.kurangAbsen + item.totalPotTunkin;
+  item.totalTerimaGabungan = item.gajiBersih + item.sisaTunkin;
+
+  item.rincianPotGaji = {
+    bri: parseMoneyVal(pgRaw.bri, false),
+    koperasi: parseMoneyVal(pgRaw.koperasi, false),
+    btn: parseMoneyVal(pgRaw.btn, false),
+    bws: parseMoneyVal(pgRaw.bws, false),
+    sukaDuka: parseMoneyVal(pgRaw.sukaDuka, false),
+    puraIslam: parseMoneyVal(pgRaw.puraIslam, false),
+    polsek: parseMoneyVal(pgRaw.polsek, false),
+    potLain: parseMoneyVal(pgRaw.potLain, false),
+    pmi: parseMoneyVal(pgRaw.pmi, false),
+    polwan: parseMoneyVal(pgRaw.polwan, false)
+  };
+
+  item.rekBri = String(
+    item.rekeningBri || item.rekBri || item.noRekBri ||
+    item.rekening_bri || item.rek_bri || item.no_rek_bri ||
+    item.rekeningPolri || item.rekeningPns || ''
+  ).trim();
+
+  item.rekBni = String(
+    item.rekeningBni || item.rekBni || item.noRekBni ||
+    item.rekening_bni || item.rek_bni || item.no_rek_bni ||
+    item.rekening || ''
+  ).trim();
+
+  return item;
+}
+
+function renderLeftSidebarForTerpadu() {
+  $('sideHeading').innerHTML = '<span>FILTER JENIS PERSONEL</span>';
+  const curJenis = $('filterJenis') ? $('filterJenis').value : '';
+  $('sideDynamicArea').innerHTML = `
+    <div class="side-search-card">
+      <label for="filterJenis">Jenis Personel</label>
+      <select id="filterJenis" onchange="filterTerpaduRows()">
+        <option value="" ${curJenis === '' ? 'selected' : ''}>Semua Jenis</option>
+        <option value="POLRI UMUM" ${curJenis === 'POLRI UMUM' ? 'selected' : ''}>POLRI UMUM</option>
+        <option value="POLRI TIPIKOR" ${curJenis === 'POLRI TIPIKOR' ? 'selected' : ''}>POLRI TIPIKOR</option>
+        <option value="PNS" ${curJenis === 'PNS' ? 'selected' : ''}>PNS</option>
+        <option value="PPPK" ${curJenis === 'PPPK' ? 'selected' : ''}>PPPK</option>
+      </select>
+      <div class="side-search-btns">
+        <button type="button" class="btn-find" onclick="filterTerpaduRows();closeDrawer();">Terapkan</button>
+        <button type="button" class="btn-clear" onclick="resetTerpaduSearch()">Reset</button>
+      </div>
+    </div>
+  `;
+}
+
+function syncKeywordFromMain(val) {
+  filterTerpaduRows();
+  if ($('pgSearchInput') && !$('petikanGajiPanel').classList.contains('hidden')) {
+    $('pgSearchInput').value = val;
+  }
+}
+
+function switchTopMenu(topKey) {
+  if (topKey !== 'mon-terpadu' && !appPermissions.canWrite) {
+    topKey = 'mon-terpadu';
+  }
+  currentTopTab = topKey;
+  hideMsg();
+  closeDrawer();
+
+  if (!appPermissions.canView) {
+    showLoginPageOnly();
+    return;
+  }
+
+  document.querySelectorAll('.sakti-mod-btn').forEach(b => b.classList.remove('active'));
+  if ($('tab-' + topKey)) $('tab-' + topKey).classList.add('active');
+  document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+
+  if (topKey === 'mon-terpadu') {
+    renderLeftSidebarForTerpadu();
+    $('terpadu').classList.remove('hidden');
+    $('pageTitle').textContent = 'Monitoring Terpadu Gaji, Tunkin & Potongan';
+    $('subTitle').textContent = 'Beranda / Monitoring Gaji & Tunkin / Seluruh Personel';
+    loadTerpadu();
+    return;
+  }
+
+  if (!appPermissions.canWrite) {
+    $('sideHeading').innerHTML = '<span>OTORISASI MODUL</span>';
+    $('sideDynamicArea').innerHTML = '<div style="padding:8px;font-size:12px;color:#cbd5e1;">Akun personel (Viewer) dapat melihat seluruh data Monitoring Gaji &amp; Tunkin serta mengubah password akun.</div>';
+    $('lock-' + topKey).classList.remove('hidden');
+    $('pageTitle').textContent = topKey === 'req-tunkin' ? 'Modul Permintaan Tunkin' : 'Modul Pembuatan SPPD';
+    $('subTitle').textContent = 'Beranda / Khusus Admin & Operator';
+    return;
+  }
+
+  $('sideHeading').innerHTML = '<span>' + (topKey === 'req-tunkin' ? 'MODUL PERMINTAAN TUNKIN' : 'MODUL PEMBUATAN SPPD') + '</span>';
+  const groups = SUB_GROUPS[topKey] || [];
+  let html = '';
+  let firstItem = null;
+
+  groups.forEach(g => {
+    const visibleItems = g.items.filter(it => !it.adminOnly || appPermissions.canManageUsers);
+    if (!visibleItems.length) return;
+    if (!firstItem) firstItem = visibleItems[0];
+    html += `<div class="sakti-tree-group"><div class="sakti-tree-header">${esc(g.group)}</div><div class="sakti-tree-list">`;
+    visibleItems.forEach(it => {
+      html += `<button type="button" id="subbtn-${it.id}" onclick="showSubSection('${it.id}');closeDrawer();">${esc(it.label)}</button>`;
+    });
+    html += `</div></div>`;
+  });
+
+  $('sideDynamicArea').innerHTML = html;
+  if (firstItem) showSubSection(firstItem.id);
+}
+
+function showSubSection(sectionId) {
+  hideMsg();
+  document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+  const target = $(sectionId);
+  if (target) target.classList.remove('hidden');
+
+  document.querySelectorAll('.sakti-tree-list button').forEach(b => b.classList.remove('active'));
+  const activeBtn = $('subbtn-' + sectionId);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  const allItems = Object.values(SUB_GROUPS).flat().flatMap(g => g.items);
+  const meta = allItems.find(x => x.id === sectionId);
+  if (meta) {
+    $('pageTitle').textContent = meta.title;
+    $('subTitle').textContent = 'Beranda / ' + meta.crumb;
+  }
+
+  if (sectionId === 'import-excel') loadImportSheetInfo();
+  if (sectionId === 'personel') loadPeople();
+  if (sectionId === 'status' && !$('stTanggal').value) {
+    $('stTanggal').value = new Date().toISOString().slice(0, 10);
+  }
+  if (sectionId === 'riwayat') loadHistory();
+  if (sectionId === 'kelola-akun') loadAuthAccounts();
+  if (sectionId === 'sppd-form' || sectionId === 'sppd-pejabat' || sectionId === 'sppd-riwayat') {
+    loadSppdWorkspace();
+  }
+}
+
+/* ===================== LOGIN & UBAH PASSWORD ===================== */
+
+function submitLoginForm(e) {
+  e.preventDefault();
+  const u = $('loginUsername').value.trim();
+  const p = $('loginPassword').value.trim();
+  const btn = $('btnLoginSubmit');
+  $('loginMsg').classList.add('hidden');
+  btn.disabled = true;
+  btn.textContent = 'Memverifikasi Akun...';
+
+  runGasApi('verifyLogin', [u, p])
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = 'Masuk ke Sistem ARISTANA';
+      if (res && res.success) {
+        authToken = res.token;
+        sessionStorage.setItem('aristana_token', authToken);
+        $('loginUsername').value = '';
+        $('loginPassword').value = '';
+        appPermissions.canView = true;
+        showMainAppOnly();
+        msg('Selamat datang, ' + res.nama + ' (' + res.role + ')', 'success');
+        init(false);
+      } else {
+        $('loginMsg').textContent = (res && res.message) || 'Login gagal. Periksa NRP/NIP atau password Anda.';
+        $('loginMsg').classList.remove('hidden');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Masuk ke Sistem ARISTANA';
+      $('loginMsg').textContent = err && err.message ? err.message : String(err);
+      $('loginMsg').classList.remove('hidden');
+    });
+}
+
+function logoutSession() {
+  authToken = '';
+  sessionStorage.removeItem('aristana_token');
+  appPermissions = { canView: false, canWrite: false, canManageUsers: false, readOnly: true };
+  currentUserInfo = null;
+  if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.add('hidden');
+  if ($('tab-sppd')) $('tab-sppd').classList.add('hidden');
+  if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.add('hidden');
+  if ($('petikanGajiPanel')) $('petikanGajiPanel').classList.add('hidden');
+  if ($('importMonitoringPanel')) $('importMonitoringPanel').classList.add('hidden');
+  $('loginMsg').classList.add('hidden');
+  showLoginPageOnly();
+}
+
+function openChangePassModal() {
+  if (!appPermissions.canView) return;
+  $('changePassMsg').classList.add('hidden');
+  $('oldPassInput').value = '';
+  $('newPassInput').value = '';
+  $('confirmPassInput').value = '';
+  if (currentUserInfo) {
+    $('changePassUserLabel').innerHTML =
+      `Akun aktif: <strong>${esc(currentUserInfo.name)}</strong> (${esc(currentUserInfo.username)})`;
+  }
+  $('changePasswordModal').classList.remove('hidden');
+  $('oldPassInput').focus();
+}
+
+function closeChangePassModal() {
+  $('changePasswordModal').classList.add('hidden');
+}
+
+function submitChangePasswordForm(e) {
+  e.preventDefault();
+  const oldP = $('oldPassInput').value.trim();
+  const newP = $('newPassInput').value.trim();
+  const confP = $('confirmPassInput').value.trim();
+  const errBox = $('changePassMsg');
+  errBox.classList.add('hidden');
+
+  if (!oldP || !newP) {
+    errBox.textContent = 'Password lama dan password baru wajib diisi.';
+    errBox.classList.remove('hidden');
+    return;
+  }
+  if (newP.length < 4) {
+    errBox.textContent = 'Password baru minimal 4 karakter.';
+    errBox.classList.remove('hidden');
+    return;
+  }
+  if (newP !== confP) {
+    errBox.textContent = 'Konfirmasi password baru tidak cocok.';
+    errBox.classList.remove('hidden');
+    return;
+  }
+
+  const btn = $('btnSubmitChangePass');
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  runGasApi('changePassword', [oldP, newP, authToken])
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = 'Simpan Password Baru';
+      if (res && res.ok) {
+        closeChangePassModal();
+        msg(res.message || 'Password berhasil diubah.', 'success');
+      } else {
+        errBox.textContent = (res && res.message) || 'Gagal mengubah password.';
+        errBox.classList.remove('hidden');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Simpan Password Baru';
+      errBox.textContent = err && err.message ? err.message : String(err);
+      errBox.classList.remove('hidden');
+    });
+}
+
+function updateAvailablePeriodsDatalist(periods) {
+  const dl = $('availablePeriodsList');
+  if (!dl || !Array.isArray(periods)) return;
+  dl.innerHTML = periods.map(p => `<option value="${esc(p)}"></option>`).join('');
+}
+
+function init(refreshTab = false) {
+  if (!authToken) {
+    showLoginPageOnly();
+    return;
+  }
+
+  call('getBootstrap', [], d => {
+    if (!d || !d.authenticated || !d.permissions || !d.permissions.canView) {
+      authToken = '';
+      sessionStorage.removeItem('aristana_token');
+      appPermissions = { canView: false, canWrite: false, canManageUsers: false, readOnly: true };
+      currentUserInfo = null;
+      showLoginPageOnly();
+      return;
+    }
+
+    showMainAppOnly();
+    appPermissions = d.permissions;
+    currentUserInfo = d.user;
+    const badge = $('roleBadge');
+
+    if (appPermissions.canWrite && d.user) {
+      badge.className = 'sakti-status-chip ' + (d.user.role === 'ADMIN' ? 'admin' : 'operator');
+      badge.textContent = d.user.role + ': ' + d.user.name;
+      $('userInfo').textContent = d.user.name + ' (' + d.user.role + ')';
+      if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.remove('hidden');
+      if ($('tab-sppd')) $('tab-sppd').classList.remove('hidden');
+      if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.remove('hidden');
+    } else {
+      badge.className = 'sakti-status-chip viewer';
+      badge.textContent = 'PERSONEL: ' + d.user.name + (d.user.nrp ? ' (' + d.user.nrp + ')' : '');
+      $('userInfo').textContent = d.user.name + ' • Akses Monitoring Gaji & Tunkin';
+      if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.add('hidden');
+      if ($('tab-sppd')) $('tab-sppd').classList.add('hidden');
+      if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.add('hidden');
+      if ($('petikanGajiPanel')) $('petikanGajiPanel').classList.add('hidden');
+      if ($('importMonitoringPanel')) $('importMonitoringPanel').classList.add('hidden');
+    }
+
+    if (d.counts) {
+      $('total').textContent = d.counts.total;
+      $('aktif').textContent = d.counts.aktif;
+      $('polri').textContent = d.counts.polri;
+      $('pns').textContent = d.counts.pns;
+    }
+    if (Array.isArray(d.availablePeriods)) {
+      updateAvailablePeriodsDatalist(d.availablePeriods);
+    }
+    if (d.period) {
+      if (!$('periodDash').value) $('periodDash').value = d.period;
+      if (!$('dPeriode').value) $('dPeriode').value = d.period;
+      if (!$('viewPeriod').value) $('viewPeriod').value = d.period;
+      if ($('monImpPeriode') && !$('monImpPeriode').value) $('monImpPeriode').value = d.period;
+      if ($('pgPeriode') && !$('pgPeriode').value) $('pgPeriode').value = d.period;
+      if ($('periodImportPolri') && !$('periodImportPolri').value) $('periodImportPolri').value = d.period;
+      if ($('periodImportPns') && !$('periodImportPns').value) $('periodImportPns').value = d.period;
+    }
+    if ($('pgTglCetak') && !$('pgTglCetak').value) {
+      $('pgTglCetak').value = new Date().toISOString().slice(0, 10);
+    }
+
+    if ($('suratActionWrap')) {
+      $('suratActionWrap').style.display = appPermissions.canWrite ? '' : 'none';
+    }
+    switchTopMenu(refreshTab ? currentTopTab : 'mon-terpadu');
+  });
+}
+
+/* ===================== FITUR IMPORT / COPAS MONITORING GAJI (ADMIN & OPERATOR) ===================== */
+
+function openMonitoringImportShortcut() {
+  switchTopMenu('mon-terpadu');
+  setTimeout(() => toggleImportMonitoringPanel(true), 120);
+}
+
+function toggleImportMonitoringPanel(forceShow) {
+  if (!appPermissions.canWrite) return;
+  const panel = $('importMonitoringPanel');
+  const shouldShow = typeof forceShow === 'boolean' ? forceShow : panel.classList.contains('hidden');
+  if (!shouldShow) {
+    panel.classList.add('hidden');
+    return;
+  }
+  if ($('petikanGajiPanel')) $('petikanGajiPanel').classList.add('hidden');
+  panel.classList.remove('hidden');
+  if ($('viewPeriod') && $('viewPeriod').value && !$('monImpPeriode').value) {
+    $('monImpPeriode').value = $('viewPeriod').value;
+  }
+  loadMonitoringGajiGabunganInfo();
+}
+
+function loadMonitoringGajiGabunganInfo() {
+  if (!appPermissions.canWrite) return;
+  call('getMonitoringGajiGabunganInfo', [], info => {
+    if (!info) return;
+    if (info.defaultPeriod && $('monImpPeriode') && !$('monImpPeriode').value) {
+      $('monImpPeriode').value = info.defaultPeriod;
+    }
+    renderPeriodBadges('monGajiPeriodsInfo', info.periods, info.rowCount);
+  });
+}
+
+function switchMonImportMode(mode) {
+  const isCopas = mode === 'COPAS';
+  $('tabMonModeCopas').classList.toggle('active', isCopas);
+  $('tabMonModeFile').classList.toggle('active', !isCopas);
+  $('monModeCopasBox').classList.toggle('hidden', !isCopas);
+  $('monModeFileBox').classList.toggle('hidden', isCopas);
+  $('monImportPreviewWrap').classList.add('hidden');
+}
+
+function parseClipboardMatrix(rawText) {
+  const clean = String(rawText || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/^[\n]+|[\n]+$/g, '');
+  if (!clean) return [];
+  const lines = clean.split('\n').filter(l => l.replace(/\t/g, '').trim() !== '');
+  return lines.map(line => {
+    if (line.indexOf('\t') >= 0) return line.split('\t').map(c => c.trim());
+    if (line.indexOf(';') >= 0) return line.split(';').map(c => c.trim());
+    return line.split(',').map(c => c.trim());
+  });
+}
+
+function renderMonImportPreview(matrix) {
+  if (!matrix || !matrix.length) {
+    $('monImportPreviewWrap').classList.add('hidden');
+    return;
+  }
+  let maxCols = 0;
+  matrix.slice(0, 6).forEach(r => { if (r.length > maxCols) maxCols = r.length; });
+  const sample = matrix.slice(0, 5);
+  $('monImportPreviewTable').innerHTML = sample.map((r, rIdx) => {
+    const cells = [];
+    for (let c = 0; c < maxCols; c++) {
+      const val = esc(r[c] == null ? '' : r[c]);
+      cells.push(rIdx === 0 ? `<th>${val || 'Kol ' + (c + 1)}</th>` : `<td>${val}</td>`);
+    }
+    return `<tr>${cells.join('')}</tr>`;
+  }).join('');
+  $('monImportPreviewWrap').classList.remove('hidden');
+}
+
+function previewMonCopasText() {
+  const txt = $('monCopasText').value;
+  const matrix = parseClipboardMatrix(txt);
+  const statusBox = $('monCopasStatus');
+
+  if (!matrix.length) {
+    statusBox.classList.add('hidden');
+    $('monImportPreviewWrap').classList.add('hidden');
+    $('btnExecMonCopas').disabled = true;
+    return;
+  }
+
+  const colCount = matrix[0].length;
+  statusBox.classList.remove('hidden', 'ok', 'err');
+  if (colCount >= 5) {
+    statusBox.classList.add('ok');
+    statusBox.innerHTML = `<strong>✔ Data Copas Terdeteksi:</strong> <strong>${matrix.length} baris</strong> &times; <strong>${colCount} kolom</strong> siap diimpor ke sheet <code>MONITORING GAJI</code>.`;
+    $('btnExecMonCopas').disabled = false;
+  } else {
+    statusBox.classList.add('err');
+    statusBox.innerHTML = `<strong>✖ Format Kolom Terlalu Sedikit (${colCount} kolom):</strong> Pastikan Anda memblok seluruh kolom tabel Monitoring Gaji dari Excel sebelum copy-paste.`;
+    $('btnExecMonCopas').disabled = true;
+  }
+  renderMonImportPreview(matrix);
+}
+
+function resetMonCopasImport() {
+  $('monCopasText').value = '';
+  $('monCopasStatus').classList.add('hidden');
+  $('monImportPreviewWrap').classList.add('hidden');
+  $('btnExecMonCopas').disabled = true;
+}
+
+function submitMonCopasImport() {
+  const rawText = $('monCopasText').value;
+  if (!rawText || !rawText.trim()) return msg('Tempel (copy-paste) data Monitoring Gaji terlebih dahulu.', 'error');
+
+  const periode = $('monImpPeriode').value;
+  if (!/^\d{4}-\d{2}$/.test(periode)) {
+    return msg('Pilih Periode Bulan Tujuan (YYYY-MM) terlebih dahulu.', 'error');
+  }
+
+  const mode = $('monImpMode').value;
+  const matrix = parseClipboardMatrix(rawText);
+  const btn = $('btnExecMonCopas');
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan Data Copas...';
+
+  runGasApi('importMonitoringGajiGabungan', [{
+      periode: periode,
+      mode: mode,
+      fileName: 'Copas_Monitoring_Gaji_' + periode,
+      rows: matrix
+    }, authToken])
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = 'Proses Simpan Data Copas Monitoring Gaji';
+      if (res && res.ok) {
+        msg(res.message, 'success');
+        resetMonCopasImport();
+        loadMonitoringGajiGabunganInfo();
+        $('viewPeriod').value = periode;
+        loadTerpadu();
+      } else {
+        msg((res && res.message) || 'Gagal mengimpor data copas Monitoring Gaji.', 'error');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Proses Simpan Data Copas Monitoring Gaji';
+      fail(err);
+    });
+}
+
+function setupMonFileDropzone() {
+  const dz = $('dropMonFile');
+  if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleMonFileSelect(e.dataTransfer.files[0]);
+    }
+  });
+}
+
+function handleMonFileSelect(file) {
+  if (!file) return;
+  if (typeof XLSX === 'undefined') {
+    return msg('Pustaka pembaca Excel belum selesai dimuat. Muat ulang halaman lalu coba kembali.', 'error');
+  }
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const wb = XLSX.read(data, { type: 'array', raw: false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rawMatrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+      const cleanMatrix = rawMatrix.filter(r => Array.isArray(r) && r.some(c => String(c || '').trim() !== ''));
+
+      const statusBox = $('monFileStatus');
+      statusBox.classList.remove('hidden', 'ok', 'err');
+      if (!cleanMatrix.length) {
+        statusBox.classList.add('err');
+        statusBox.textContent = 'File Excel kosong atau tidak memiliki baris data.';
+        $('btnExecMonFile').disabled = true;
+        parsedMonFileImport = null;
+        return;
+      }
+
+      parsedMonFileImport = { fileName: file.name, rows: cleanMatrix };
+      statusBox.classList.add('ok');
+      statusBox.innerHTML = `<strong>✔ File Siap Diimpor:</strong> ${esc(file.name)} (<strong>${cleanMatrix.length} baris</strong> &times; <strong>${cleanMatrix[0].length} kolom</strong>)`;
+      $('btnExecMonFile').disabled = false;
+      renderMonImportPreview(cleanMatrix);
+    } catch (err) {
+      msg('Gagal membaca file Excel: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function resetMonFileImport() {
+  $('fileMonGaji').value = '';
+  $('monFileStatus').classList.add('hidden');
+  $('monImportPreviewWrap').classList.add('hidden');
+  $('btnExecMonFile').disabled = true;
+  parsedMonFileImport = null;
+}
+
+function submitMonFileImport() {
+  if (!parsedMonFileImport) return msg('Pilih file Excel Monitoring Gaji terlebih dahulu.', 'error');
+  const periode = $('monImpPeriode').value;
+  if (!/^\d{4}-\d{2}$/.test(periode)) {
+    return msg('Pilih Periode Bulan Tujuan (YYYY-MM) terlebih dahulu.', 'error');
+  }
+  const mode = $('monImpMode').value;
+  const btn = $('btnExecMonFile');
+  btn.disabled = true;
+  btn.textContent = 'Mengimpor File...';
+
+  runGasApi('importMonitoringGajiGabungan', [{
+      periode: periode,
+      mode: mode,
+      fileName: parsedMonFileImport.fileName,
+      rows: parsedMonFileImport.rows
+    }, authToken])
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = 'Proses Import File Monitoring Gaji';
+      if (res && res.ok) {
+        msg(res.message, 'success');
+        resetMonFileImport();
+        loadMonitoringGajiGabunganInfo();
+        $('viewPeriod').value = periode;
+        loadTerpadu();
+      } else {
+        msg((res && res.message) || 'Gagal mengimpor file Monitoring Gaji.', 'error');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Proses Import File Monitoring Gaji';
+      fail(err);
+    });
+}
+
+/* ===================== FITUR IMPORT EXCEL POLRI & PNS MULTI-PERIODE ===================== */
+
+function setupExcelDropzones() {
+  ['Polri', 'Pns'].forEach(key => {
+    const dz = $('drop' + key);
+    if (!dz) return;
+    const type = key.toUpperCase();
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleExcelSelect(type, e.dataTransfer.files[0]);
+      }
+    });
+  });
+}
+
+function renderPeriodBadges(containerId, periods, totalRows) {
+  const el = $(containerId);
+  if (!el) return;
+  const countPrefix = typeof totalRows === 'number'
+    ? `<span class="excel-period-chip" style="background:#fef3c7;color:#92400e;border-color:#fde68a;">Total: ${totalRows} baris</span>`
+    : '';
+  if (!Array.isArray(periods) || !periods.length) {
+    el.innerHTML = countPrefix + '<span class="muted">Belum ada periode tersimpan.</span>';
+    return;
+  }
+  el.innerHTML = countPrefix + '<span class="muted" style="align-self:center;margin-right:4px;">Periode tersimpan:</span>' +
+    periods.map(p => `<span class="excel-period-chip">${esc(p)}</span>`).join('');
+}
+
+function loadImportSheetInfo() {
+  if (!appPermissions.canWrite) return;
+  call('getImportSheetInfo', [], info => {
+    if (!info) return;
+    importSheetMeta.polri = info.polri;
+    importSheetMeta.pns = info.pns;
+    importSheetMeta.defaultPeriod = info.defaultPeriod || '';
+
+    if (info.defaultPeriod) {
+      if ($('periodImportPolri') && !$('periodImportPolri').value) $('periodImportPolri').value = info.defaultPeriod;
+      if ($('periodImportPns') && !$('periodImportPns').value) $('periodImportPns').value = info.defaultPeriod;
+    }
+
+    $('badgeColsPolri').textContent = info.polri.colCount + ' Kolom';
+    $('infoSheetPolri').textContent =
+      `Sheet aktif: ${info.polri.rowCount} total baris × ${info.polri.colCount} kolom asli`;
+    renderPeriodBadges('periodsBadgesPolri', info.polri.periods);
+
+    $('badgeColsPns').textContent = info.pns.colCount + ' Kolom';
+    $('infoSheetPns').textContent =
+      `Sheet aktif: ${info.pns.rowCount} total baris × ${info.pns.colCount} kolom asli`;
+    renderPeriodBadges('periodsBadgesPns', info.pns.periods);
+  });
+}
+
+function handleExcelSelect(targetType, file) {
+  if (!file) return;
+  if (typeof XLSX === 'undefined') {
+    return msg('Pustaka pembaca Excel (SheetJS) belum selesai dimuat. Muat ulang halaman lalu coba kembali.', 'error');
+  }
+
+  const isPolri = targetType === 'POLRI';
+  const suffix = isPolri ? 'Polri' : 'Pns';
+  const meta = isPolri ? importSheetMeta.polri : importSheetMeta.pns;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, { type: 'array', raw: false });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      const rawMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '', raw: false });
+      const cleanMatrix = rawMatrix.filter(r => Array.isArray(r) && r.some(c => String(c || '').trim() !== ''));
+
+      if (!cleanMatrix.length) {
+        return msg('File Excel kosong atau tidak memiliki baris data.', 'error');
+      }
+
+      let incomingCols = 0;
+      cleanMatrix.forEach(r => {
+        let lastNonEmpty = r.length;
+        while (lastNonEmpty > 0 && String(r[lastNonEmpty - 1] || '').trim() === '') {
+          lastNonEmpty--;
+        }
+        if (lastNonEmpty > incomingCols) incomingCols = lastNonEmpty;
+      });
+      if (incomingCols === 0) incomingCols = cleanMatrix[0].length;
+
+      const expectedCols = meta ? meta.colCount : 0;
+      const isMatch = expectedCols === 0 || incomingCols === expectedCols || incomingCols === expectedCols + 1;
+
+      const statusBox = $('statusImport' + suffix);
+      statusBox.classList.remove('hidden', 'ok', 'err');
+
+      if (isMatch) {
+        statusBox.classList.add('ok');
+        statusBox.innerHTML = `
+          <strong>✔ File Siap Diimpor:</strong> ${esc(file.name)}<br>
+          Jumlah Baris Terbaca: <strong>${cleanMatrix.length} baris</strong> |
+          Jumlah Kolom: <strong>${incomingCols} kolom</strong> (Cocok dengan sheet ${targetType})
+        `;
+        parsedExcelImport[targetType] = {
+          fileName: file.name,
+          rows: cleanMatrix,
+          colCount: incomingCols
+        };
+        $('btnExecImport' + suffix).disabled = false;
+      } else {
+        statusBox.classList.add('err');
+        statusBox.innerHTML = `
+          <strong>✖ Jumlah Kolom Tidak Sama!</strong> (${esc(file.name)})<br>
+          Kolom pada file Excel: <strong>${incomingCols} kolom</strong>, sedangkan sheet <strong>${targetType}</strong> membutuhkan <strong>${expectedCols} kolom</strong>.<br>
+          Pastikan file Excel POLRI dan PNS tidak tertukar.
+        `;
+        parsedExcelImport[targetType] = null;
+        $('btnExecImport' + suffix).disabled = true;
+      }
+
+      const previewRows = cleanMatrix.slice(0, 5);
+      const tableHtml = previewRows.map((r, rIdx) => {
+        const cells = [];
+        for (let c = 0; c < incomingCols; c++) {
+          const val = esc(r[c] == null ? '' : r[c]);
+          cells.push(rIdx === 0 ? `<th>${val || 'Kol ' + (c + 1)}</th>` : `<td>${val}</td>`);
+        }
+        return `<tr>${cells.join('')}</tr>`;
+      }).join('');
+
+      $('previewTable' + suffix).innerHTML = tableHtml;
+      $('previewWrap' + suffix).classList.remove('hidden');
+    } catch (err) {
+      msg('Gagal membaca file Excel: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function resetImportBox(targetType) {
+  const suffix = targetType === 'POLRI' ? 'Polri' : 'Pns';
+  $('fileImport' + suffix).value = '';
+  $('statusImport' + suffix).classList.add('hidden');
+  $('previewWrap' + suffix).classList.add('hidden');
+  $('btnExecImport' + suffix).disabled = true;
+  parsedExcelImport[targetType] = null;
+}
+
+function executeExcelImport(targetType) {
+  const item = parsedExcelImport[targetType];
+  if (!item) return msg('Pilih file Excel yang valid terlebih dahulu.', 'error');
+
+  const suffix = targetType === 'POLRI' ? 'Polri' : 'Pns';
+  const periode = $('periodImport' + suffix).value;
+  if (!/^\d{4}-\d{2}$/.test(periode)) {
+    return msg(`Pilih Periode Bulan (YYYY-MM) tujuan import untuk ${targetType} terlebih dahulu.`, 'error');
+  }
+
+  const mode = $('modeImport' + suffix).value;
+  const modeText = mode === 'APPEND'
+    ? `MENAMBAHKAN ke data bulan ${periode}`
+    : `MEMPERBARUI data khusus bulan ${periode} (data bulan lain tetap aman tersimpan)`;
+
+  if (!confirm(`Anda akan mengimpor ${item.rows.length} baris dari "${item.fileName}" ke sheet ${targetType} untuk periode ${periode} dengan mode ${modeText}. Lanjutkan?`)) {
+    return;
+  }
+
+  const btn = $('btnExecImport' + suffix);
+  btn.disabled = true;
+  btn.textContent = 'Mengimpor...';
+  msg(`Sedang mengimpor ${item.rows.length} baris ke sheet ${targetType} periode ${periode}...`, 'notice');
+
+  runGasApi('importExcelSheetData', [{
+      targetType: targetType,
+      periode: periode,
+      mode: mode,
+      fileName: item.fileName,
+      rows: item.rows
+    }, authToken])
+    .then(res => {
+      btn.textContent = `Proses Import Data ${targetType}`;
+      if (res && res.ok) {
+        msg(res.message, 'success');
+        resetImportBox(targetType);
+        loadImportSheetInfo();
+        $('viewPeriod').value = periode;
+        $('periodDash').value = periode;
+        if ($('pgPeriode')) $('pgPeriode').value = periode;
+      } else {
+        btn.disabled = false;
+        msg((res && res.message) || `Gagal mengimpor data ${targetType}.`, 'error');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = `Proses Import Data ${targetType}`;
+      fail(err);
+    });
+}
+
+/* ===================== FITUR PETIKAN GAJI (KHUSUS ADMIN & OPERATOR) ===================== */
+
+function togglePetikanGajiPanel(forceShow, prefillNrp) {
+  if (!appPermissions.canWrite) return;
+  const panel = $('petikanGajiPanel');
+  const shouldShow = typeof forceShow === 'boolean' ? forceShow : panel.classList.contains('hidden');
+  if (!shouldShow) {
+    panel.classList.add('hidden');
+    return;
+  }
+  if ($('importMonitoringPanel')) $('importMonitoringPanel').classList.add('hidden');
+  panel.classList.remove('hidden');
+  const seed = prefillNrp || ($('terpaduSearchInput') ? $('terpaduSearchInput').value.trim() : '');
+  if (seed) $('pgSearchInput').value = seed;
+  if ($('viewPeriod') && $('viewPeriod').value && !$('pgPeriode').value) {
+    $('pgPeriode').value = $('viewPeriod').value;
+  }
+  if ($('pgTglCetak') && !$('pgTglCetak').value) {
+    $('pgTglCetak').value = new Date().toISOString().slice(0, 10);
+  }
+  onPetikanKeperluanChange();
+  onPetikanModeBulanChange();
+  if ($('pgSearchInput').value.trim()) {
+    loadPetikanGajiPreview();
+  } else {
+    $('pgSearchInput').focus();
+  }
+}
+
+function onPetikanModeBulanChange() {
+  const mode = $('pgModeBulan').value;
+  $('lblPgPeriode').textContent = mode === '3_BULAN'
+    ? 'Sampai Bulan (3 Bln Terakhir)'
+    : 'Pilih Bulan Petikan Gaji';
+}
+
+function onPetikanKeperluanChange() {
+  const kep = $('pgKeperluan').value;
+  const badge = $('pgRuleBadge');
+  if (kep === 'BPJS') {
+    badge.className = 'petikan-badge-rule bpjs';
+    badge.textContent = '✓ Watermark Full-Page: BPJS | Tanda Tangan Scan Kasikeu otomatis dipasang.';
+  } else if (kep === 'KREDIT_MOU') {
+    badge.className = 'petikan-badge-rule mou';
+    badge.textContent = '✍️ Watermark Full-Page: KREDIT BANK | Ruang Tanda Tangan Basah Kasikeu (tanpa scan).';
+  } else {
+    badge.className = 'petikan-badge-rule nonmou';
+    badge.textContent = 'ℹ️ Watermark Full-Page: RINCIAN GAJI | Rincian gaji persis TANPA tanda tangan Kasikeu.';
+  }
+  applyNbPreset();
+  renderPetikanGajiSheet();
+}
+
+function applyNbPreset() {
+  const preset = $('pgNbPreset').value;
+  const kep = $('pgKeperluan').value;
+  if (preset === 'CUSTOM') return;
+  const key = preset === 'AUTO' ? kep : preset;
+  $('pgNbText').value = NB_TEMPLATES[key] || '';
+}
+
+function loadPetikanGajiPreview() {
+  if (!appPermissions.canWrite) return;
+  const q = $('pgSearchInput').value.trim();
+  const period = $('pgPeriode').value || $('viewPeriod').value || '';
+  const modeBulan = $('pgModeBulan').value || '1_BULAN';
+  const tglCetak = $('pgTglCetak') ? $('pgTglCetak').value : '';
+  if (!q) {
+    msg('Masukkan Nama atau NRP/NIP personel pada form Petikan Gaji.', 'error');
+    $('pgSearchInput').focus();
+    return;
+  }
+  const btn = $('btnLoadPetikan');
+  btn.disabled = true;
+  btn.textContent = 'Memuat...';
+
+  runGasApi('getPetikanGajiData', [q, period, modeBulan, authToken, tglCetak])
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = 'Generate & Print Preview';
+      if (res && res.ok) {
+        currentPetikanPayload = res;
+        if ($('pgTglCetak') && res.tglCetak) {
+          $('pgTglCetak').value = res.tglCetak;
+        }
+        $('petikanPreviewArea').classList.remove('hidden');
+        renderPetikanGajiSheet();
+        const jmlSlip = (res.slips || []).length;
+        msg(`Print Preview ${jmlSlip} lembar Petikan Gaji (${res.personel.nama}) siap dicetak pada A4 Portrait (Print Area A1:K47).`, 'success');
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = 'Generate & Print Preview';
+      fail(err);
+    });
+}
+
+function transferPetikanToSheet() {
+  if (!appPermissions.canWrite) return;
+  const q = $('pgSearchInput').value.trim();
+  if (!q) {
+    msg('Masukkan Nama atau NRP/NIP personel terlebih dahulu.', 'error');
+    return;
+  }
+  const btn = $('btnTransferSheetPetikan');
+  btn.disabled = true;
+  btn.textContent = 'Mentransfer ke Sheet...';
+
+  runGasApi('transferKeTemplatePetikanGaji', [{
+      query: q,
+      periode: $('pgPeriode').value || $('viewPeriod').value || '',
+      modeBulan: $('pgModeBulan').value || '1_BULAN',
+      keperluan: $('pgKeperluan').value,
+      useNb: $('pgUseNb').checked,
+      nbText: $('pgNbText').value,
+      tglCetak: $('pgTglCetak') ? $('pgTglCetak').value : ''
+    }, authToken])
+    .then(res => {
+      btn.disabled = false;
+      btn.textContent = '📊 Transfer ke Template Spreadsheet';
+      if (res && res.ok) {
+        const e = $('message');
+        e.className = 'notice success';
+        e.classList.remove('hidden');
+        e.innerHTML = 'Berhasil transfer ke Template Petikan Gaji: <a href="' + encodeURI(res.url) + '" target="_blank" rel="noopener"><strong>' + esc(res.name) + '</strong></a>';
+      }
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = '📊 Transfer ke Template Spreadsheet';
+      fail(err);
+    });
+}
+
+function fmtPetikanNum(val) {
+  const n = Math.round(Number(val) || 0);
+  return n > 0 ? n.toLocaleString('en-US') : '-';
+}
+
+function buildFullPageWatermarkHtml(wmClass, wmText) {
+  const label = `${wmText} • SIKEU POLRES TABANAN`;
+  const cells = Array.from({ length: 42 }, () => `<span>${esc(label)}</span>`).join('');
+  return `<div class="petikan-watermark-overlay ${wmClass}" aria-hidden="true">${cells}</div>`;
+}
+
+function buildPetikanSheetsHtml_() {
+  if (!currentPetikanPayload) return '';
+  const slips = currentPetikanPayload.slips || [currentPetikanPayload.personel];
+  const ksk = currentPetikanPayload.kasikeu;
+  const kep = $('pgKeperluan').value;
+  const useNb = $('pgUseNb').checked;
+  const nbText = ($('pgNbText').value || '').trim();
+  const ttdUrl = currentPetikanPayload.ttdScanDataUrl;
+
+  let wmClass = 'wm-bpjs';
+  let wmText = 'BPJS';
+
+  if (kep === 'KREDIT_MOU') {
+    wmClass = 'wm-mou';
+    wmText = 'KREDIT BANK';
+  } else if (kep === 'KREDIT_NON_MOU') {
+    wmClass = 'wm-nonmou';
+    wmText = 'RINCIAN GAJI';
+  }
+
+  return slips.map((p, idx) => {
+    let ttdContent = '';
+    if (kep === 'BPJS') {
+      ttdContent = ttdUrl
+        ? `<img src="${esc(ttdUrl)}" alt="TTD Scan Kasikeu" referrerpolicy="no-referrer" onerror="this.style.display='none';">`
+        : '';
+    } else if (kep === 'KREDIT_MOU') {
+      ttdContent = `<span style="font-size:8.5pt;color:#475569;font-style:italic;">(Tanda Tangan Basah)</span>`;
+    } else {
+      ttdContent = '';
+    }
+
+    const showSignerHeader = kep === 'BPJS' || kep === 'KREDIT_MOU';
+    const showSignerFooter = kep === 'BPJS' || kep === 'KREDIT_MOU';
+    const tglKolomTtd = p.tglSurat || `Tabanan,\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0${p.bulanLabel || ''}`;
+
+    const nbBlockHtml = useNb
+      ? `<div class="petikan-nb-box">
+           <div><strong>NB :</strong> ${nbText ? esc(nbText) : '<i>(Kosong)</i>'}</div>
+           <div style="margin-top:3px;font-size:8.8pt;color:#1e293b;">
+             <strong>[DOKUMEN RESMI SIKEU POLRES TABANAN — KEPERLUAN: ${esc(wmText)}]</strong>
+           </div>
+         </div>`
+      : `<div class="petikan-nb-box">
+           <div style="font-size:8.8pt;color:#1e293b;">
+             <strong>[DOKUMEN RESMI SIKEU POLRES TABANAN — KEPERLUAN: ${esc(wmText)}]</strong>
+           </div>
+         </div>`;
+
+    return `
+      <div class="petikan-paper">
+        <div class="petikan-printarea-frame">
+          <div class="petikan-area-badge">PRINT AREA A1:K47 • HALAMAN ${idx + 1}/${slips.length} • A4 PORTRAIT</div>
+          ${buildFullPageWatermarkHtml(wmClass, wmText)}
+
+          <div class="petikan-inner">
+            <div class="petikan-kop">
+              KEPOLISIAN NEGARA REPUBLIK INDONESIA<br>
+              DAERAH BALI<br>
+              RESOR TABANAN
+            </div>
+
+            <div class="petikan-title">DAFTAR PETIKAN GAJI</div>
+
+            <div class="petikan-ident-wrap">
+              <table class="petikan-ident">
+                <tr><td style="width:110px;">BULAN</td><td style="width:12px;">:</td><td>${esc(p.bulanLabel || '-')}</td></tr>
+                <tr><td>NAMA</td><td>:</td><td>${esc(p.nama || '-')}</td></tr>
+                <tr><td>PANGKAT/NRP</td><td>:</td><td>${esc(p.pangkat || '-')} / ${esc(p.nrp || '-')}</td></tr>
+                <tr><td>KESATUAN</td><td>:</td><td>${esc(p.satuan || 'POLRES TABANAN')}</td></tr>
+              </table>
+            </div>
+
+            <table class="petikan-tbl">
+              <tr class="sec-row">
+                <td colspan="5">A. PENERIMAAN GAJI</td>
+              </tr>
+              <tr>
+                <td class="col-no">1.</td>
+                <td>Gaji Pokok</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.gjpokok)}</td>
+                <td style="width:128px;"></td>
+              </tr>
+              <tr>
+                <td class="col-no">2.</td>
+                <td>Tunjangan Istri / Suami</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tjistri)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">3.</td>
+                <td>Tunjangan Anak</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tjanak)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">4.</td>
+                <td>Tunjangan Beras</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tjberas)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">5.</td>
+                <td>Tunjangan Sandi</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tsandi)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">6.</td>
+                <td>Tunjangan Umum</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tjupns)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">7.</td>
+                <td>Tunjangan Jabatan / Struktural / Fungsional</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tjJabatan)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">8.</td>
+                <td>Tunjangan Polwan / Babinkamtibmas</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum((p.tpolwan || 0) + (p.tbabin || 0))}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">9.</td>
+                <td>Tunjangan PPh - 21</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tjpph)}</td>
+                <td></td>
+              </tr>
+              <tr class="tot-row">
+                <td colspan="3" style="text-align:center;">JUMLAH PENERIMAAN BRUTO</td>
+                <td class="rp-val" style="border-right:1px solid #000 !important;">${fmtPetikanNum(p.penerimaanBruto)}</td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums;">Rp ${fmtPetikanNum(p.penerimaanBruto)}</td>
+              </tr>
+
+              <tr class="sec-row">
+                <td colspan="5">B. POTONGAN GAJI</td>
+              </tr>
+              <tr>
+                <td class="col-no">1.</td>
+                <td>Potongan Wajib / IWP</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.iwp)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">2.</td>
+                <td>Potongan PPh - 21</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.potpph)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">3.</td>
+                <td>Potongan BPJS</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.bpjs)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no">4.</td>
+                <td>Potongan Rumdin / Lain-lain</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum((p.potswrum || 0) + (p.potlain || 0))}</td>
+                <td></td>
+              </tr>
+              <tr class="tot-row">
+                <td colspan="3" style="text-align:center;">JUMLAH POTONGAN</td>
+                <td class="rp-val" style="border-right:1px solid #000 !important;">${fmtPetikanNum(p.jumlahPotongan)}</td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums;">Rp ${fmtPetikanNum(p.jumlahPotongan)}</td>
+              </tr>
+
+              <tr class="tot-row">
+                <td colspan="3" style="text-align:center;">PENERIMAAN NETTO (A - B)</td>
+                <td class="tot-rp-label">Rp</td>
+                <td class="tot-rp-val">${fmtPetikanNum(p.penerimaanNetto)}</td>
+              </tr>
+              <tr>
+                <td class="col-no"></td>
+                <td>Pembulatan</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.pembul)}</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td class="col-no"></td>
+                <td>Uang Lauk Pauk (ULP)</td>
+                <td class="rp-label">Rp</td>
+                <td class="rp-val">${fmtPetikanNum(p.tlauk)}</td>
+                <td></td>
+              </tr>
+              <tr class="tot-row">
+                <td colspan="3" style="text-align:center;">JUMLAH YANG DIBAYARKAN</td>
+                <td class="tot-rp-label">Rp</td>
+                <td class="tot-rp-val">${fmtPetikanNum(p.jumlahDibayarkan)}</td>
+              </tr>
+            </table>
+
+            <div class="petikan-terbilang-box">
+              <strong>TERBILANG :</strong> # ${esc(p.terbilang || '')} #
+            </div>
+
+            ${nbBlockHtml}
+
+            <div class="petikan-ttd-wrap">
+              <div class="petikan-ttd-box">
+                <div class="petikan-ttd-tgl">${esc(tglKolomTtd)}</div>
+                ${showSignerHeader ? `<div>${esc(ksk.jabatan || 'PS KASIKEU')}</div>` : `<div style="height:18px;"></div>`}
+                <div class="petikan-ttd-space">${ttdContent}</div>
+                ${showSignerFooter ? `
+                  <div style="font-weight:bold;text-decoration:underline;">${esc(ksk.nama || '')}</div>
+                  <div>${esc((ksk.pangkat || '') + (ksk.nrp ? ' NRP ' + ksk.nrp : ''))}</div>
+                ` : `
+                  <div style="height:28px;"></div>
+                `}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderPetikanGajiSheet() {
+  if (!currentPetikanPayload) return;
+  const slips = currentPetikanPayload.slips || [currentPetikanPayload.personel];
+  const kep = $('pgKeperluan').value;
+  const kepLabel = kep === 'BPJS'
+    ? 'BPJS (TTD Scan Kasikeu)'
+    : kep === 'KREDIT_MOU'
+      ? 'KREDIT BANK (TTD Basah Kasikeu)'
+      : 'RINCIAN GAJI (Tanpa TTD Kasikeu)';
+
+  $('pgPreviewInfo').textContent =
+    `Print Area: A1:K47 • Orientasi: Portrait • Kertas: A4 • Keperluan: ${kepLabel} • ${slips.length} Lembar`;
+
+  $('petikanSheetsContainer').innerHTML = buildPetikanSheetsHtml_();
+}
+
+function printPetikanGaji() {
+  if (!currentPetikanPayload) {
+    msg('Generate Print Preview Petikan Gaji terlebih dahulu.', 'error');
+    return;
+  }
+  const slips = currentPetikanPayload.slips || [currentPetikanPayload.personel];
+  const p = currentPetikanPayload.personel;
+  const kep = $('pgKeperluan').value;
+  const keperluanLabel = kep === 'BPJS'
+    ? 'BPJS (TTD Scan Kasikeu)'
+    : kep === 'KREDIT_MOU'
+      ? 'KREDIT BANK (TTD Basah Kasikeu)'
+      : 'RINCIAN GAJI (Tanpa TTD Kasikeu)';
+
+  const sheetsHtml = buildPetikanSheetsHtml_();
+  const printWin = window.open('', '_blank', 'width=920,height=1050');
+  if (!printWin) {
+    msg('Pop-up cetak diblokir browser. Izinkan pop-up lalu klik Cetak kembali.', 'error');
+    return;
+  }
+
+  printWin.document.write(`
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+      <meta charset="UTF-8">
+      <title>Petikan Gaji - ${esc(p.nama)} (${esc(p.nrp)})</title>
+      <style>
+        @page { size: A4 portrait; margin: 8mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        body { margin: 0; background: #fff; font-family: 'Times New Roman', Times, serif; color: #000; }
+        .petikan-paper { width: 100%; min-height: 277mm; padding: 2mm 4mm; page-break-after: always; break-after: page; position: relative; overflow: hidden; }
+        .petikan-paper:last-child { page-break-after: auto; break-after: auto; }
+        .petikan-printarea-frame { width: 100%; min-height: 272mm; border: 0; padding: 2mm 4mm; position: relative; overflow: hidden; }
+        .petikan-area-badge { display: none; }
+        .petikan-watermark-overlay { position: absolute; inset: -35%; width: 170%; height: 170%; transform: rotate(-28deg); display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 24px 36px; pointer-events: none; z-index: 3; }
+        .petikan-watermark-overlay span { font-family: Arial, Helvetica, sans-serif; font-size: 14.5pt; font-weight: 800; letter-spacing: 2px; white-space: nowrap; text-transform: uppercase; }
+        .petikan-watermark-overlay.wm-bpjs span { color: rgba(21, 128, 61, 0.09); }
+        .petikan-watermark-overlay.wm-mou span { color: rgba(13, 71, 161, 0.09); }
+        .petikan-watermark-overlay.wm-nonmou span { color: rgba(185, 28, 28, 0.09); }
+        .petikan-inner { position: relative; z-index: 2; }
+        .petikan-kop { display: inline-block; text-align: center; font-weight: bold; font-size: 10pt; line-height: 1.22; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 6px; }
+        .petikan-title { text-align: center; font-weight: bold; font-size: 12pt; text-decoration: underline; margin: 2px 0 8px; letter-spacing: 0.4px; }
+        .petikan-ident-wrap { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+        .petikan-ident { width: 62%; border-collapse: collapse; }
+        .petikan-ident td { padding: 1.5px 3px; font-size: 10pt; font-weight: bold; }
+        .petikan-tbl { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+        .petikan-tbl td { border: 1px solid #000; padding: 2.5px 5px; font-size: 9.8pt; }
+        .petikan-tbl tr.sec-row td { font-weight: bold; padding-top: 5px; padding-bottom: 3px; }
+        .petikan-tbl tr.tot-row td { font-weight: bold; }
+        .petikan-tbl td.col-no { width: 28px; text-align: center; }
+        .petikan-tbl td.rp-label { width: 26px; text-align: center; border-right: 0; }
+        .petikan-tbl td.rp-val { width: 108px; text-align: right; border-left: 0; font-variant-numeric: tabular-nums; }
+        .petikan-tbl td.tot-rp-label { width: 26px; text-align: center; border-right: 0; font-weight: bold; }
+        .petikan-tbl td.tot-rp-val { width: 118px; text-align: right; border-left: 0; font-variant-numeric: tabular-nums; font-weight: bold; }
+        .petikan-terbilang-box { border: 1px solid #000; padding: 5px 8px; margin: 6px 0; font-size: 9.8pt; }
+        .petikan-nb-box { margin-top: 5px; font-size: 9.5pt; line-height: 1.28; }
+        .petikan-ttd-wrap { margin-top: 10px; display: flex; justify-content: flex-end; }
+        .petikan-ttd-box { width: 270px; text-align: center; font-size: 10pt; line-height: 1.24; }
+        .petikan-ttd-tgl { text-align: left; padding-left: 18px; margin-bottom: 3px; white-space: pre-wrap; }
+        .petikan-ttd-space { height: 58px; display: flex; align-items: center; justify-content: center; }
+        .petikan-ttd-space img { max-height: 66px; max-width: 190px; object-fit: contain; }
+      </style>
+    </head>
+    <body>
+      ${sheetsHtml}
+      <script>
+        window.onload = function() {
+          var imgs = Array.prototype.slice.call(document.images || []);
+          Promise.all(imgs.map(function(img) {
+            if (img.complete) return Promise.resolve();
+            return new Promise(function(resolve) {
+              img.onload = resolve;
+              img.onerror = resolve;
+            });
+          })).then(function() {
+            setTimeout(function() { window.print(); }, 250);
+          });
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWin.document.close();
+
+  call('catatLogPetikanGaji', [{
+    nrp: p.nrp,
+    nama: p.nama,
+    pangkat: p.pangkat,
+    bulanLabel: slips.map(s => s.bulanLabel).join(', '),
+    keperluanLabel: keperluanLabel,
+    nbText: $('pgUseNb').checked ? $('pgNbText').value : '',
+    jumlahDibayarkan: p.jumlahDibayarkan
+  }], () => {});
+}
+
+/* ===================== MONITORING TERPADU (SELURUH PERSONEL) ===================== */
+
+function loadTerpadu() {
+  if (!appPermissions.canView) return;
+  const period = $('viewPeriod').value;
+  call('getMonitoringTerpadu', [period], rows => {
+    terpaduCache = (rows || []).map(normalizeTerpaduItem);
+    filterTerpaduRows();
+  });
+}
+
+function resetTerpaduSearch() {
+  if ($('terpaduSearchInput')) $('terpaduSearchInput').value = '';
+  if ($('filterJenis')) $('filterJenis').value = '';
+  filterTerpaduRows();
+}
+
+function filterTerpaduRows() {
+  const kw = ($('terpaduSearchInput') ? $('terpaduSearchInput').value : '').trim().toLowerCase();
+  const kwDig = kw.replace(/\D/g, '').replace(/^0+/, '');
+  const jenisFilter = ($('filterJenis') ? $('filterJenis').value : '').trim().toUpperCase();
+
+  let filtered = terpaduCache.filter(item => {
+    const jenisItem = String(item.jenis || '').trim().toUpperCase();
+    if (jenisFilter && jenisItem !== jenisFilter) return false;
+    if (!kw) return true;
+    const nrp = String(item.nrp || '').toLowerCase();
+    const nrpDig = nrp.replace(/\D/g, '').replace(/^0+/, '');
+    const nama = String(item.nama || '').toLowerCase();
+    const pangkat = String(item.pangkat || '').toLowerCase();
+    return nama.includes(kw) || nrp.includes(kw) || pangkat.includes(kw) || (kwDig && nrpDig.includes(kwDig));
+  });
+
+  if (kw && filtered.length > 1) {
+    const exactMatch = filtered.find(item => {
+      const nrp = String(item.nrp || '').trim().toLowerCase();
+      const nrpDig = nrp.replace(/\D/g, '').replace(/^0+/, '');
+      const nama = String(item.nama || '').trim().toLowerCase();
+      return nama === kw || nrp === kw || (kwDig && nrpDig === kwDig);
+    });
+    if (exactMatch) filtered = [exactMatch];
+  }
+
+  let totGajiBersih = 0;
+  let totTunkinBersih = 0;
+  let totPotGabungan = 0;
+  let totTerimaGabungan = 0;
+
+  filtered.forEach(item => {
+    totGajiBersih += item.gajiBersih;
+    totTunkinBersih += item.sisaTunkin;
+    totPotGabungan += item.totalPotGabungan;
+    totTerimaGabungan += item.totalTerimaGabungan;
+  });
+
+  $('sumGajiBersih').textContent = 'Rp ' + formatMoney(totGajiBersih);
+  $('sumTunkinBersih').textContent = 'Rp ' + formatMoney(totTunkinBersih);
+  $('sumTotalPotongan').textContent = 'Rp ' + formatMoney(totPotGabungan);
+  $('sumTotalTerima').textContent = 'Rp ' + formatMoney(totTerimaGabungan);
+
+  $('terpaduSearchInfo').textContent = filtered.length
+    ? `Menampilkan ${filtered.length} personel${kw ? ' untuk "' + kw + '"' : ''}.`
+    : (kw ? `Tidak ditemukan data untuk "${kw}".` : 'Tidak ada data untuk periode ini.');
+
+  const tbody = $('terpaduRows');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="19" class="muted">Tidak ada data sesuai filter.</td></tr>';
+    $('cekKartu').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((item, idx) => `
+    <tr onclick="renderKartuRincianTerpadu(${idx}, window._lastFilteredTerpadu)" style="cursor:pointer;">
+      <td>${esc(item.nrp)}</td>
+      <td><strong>${esc(item.nama)}</strong></td>
+      <td>${esc(item.pangkat)}</td>
+      <td>${esc(item.jenis)}</td>
+      <td>${esc(item.grade)}</td>
+      <td class="num-col">${formatMoney(item.gajiMandat)}</td>
+      <td class="num-col pot-col">${formatMoney(item.potonganGaji)}</td>
+      <td class="num-col net-col">${formatMoney(item.gajiBersih)}</td>
+      <td class="num-col">${formatMoney(item.tunkinBruto)}</td>
+      <td class="num-col pot-col">${formatMoney(item.pajakTunkin)}</td>
+      <td class="num-col pot-col">${formatMoney(item.kurangAbsen)}</td>
+      <td class="num-col">${formatMoney(item.bayarTunkin)}</td>
+      <td class="num-col pot-col">${formatMoney(item.potKop)}</td>
+      <td class="num-col pot-col">${formatMoney(item.potLet)}</td>
+      <td class="num-col pot-col">${formatMoney(item.potPol)}</td>
+      <td class="num-col pot-col">${formatMoney(item.potLainTunkin)}</td>
+      <td class="num-col pot-col">${formatMoney(item.totalPotTunkin)}</td>
+      <td class="num-col net-col">${formatMoney(item.sisaTunkin)}</td>
+      <td class="num-col net-col"><strong>${formatMoney(item.totalTerimaGabungan)}</strong></td>
+    </tr>
+  `).join('');
+
+  window._lastFilteredTerpadu = filtered;
+
+  if (kw && filtered.length <= 5) {
+    renderKartuRincianTerpadu(0, filtered);
+  } else {
+    $('cekKartu').innerHTML = '';
+  }
+}
+
+function renderKartuRincianTerpadu(index, listSource) {
+  const arr = listSource || terpaduCache;
+  const item = arr[index];
+  if (!item) return;
+
+  const pg = item.rincianPotGaji || {};
+  const rekBriLabel = item.rekBri ? esc(item.rekBri) : '<span class="muted">-</span>';
+  const rekBniLabel = item.rekBni ? esc(item.rekBni) : '<span class="muted">-</span>';
+
+  const petikanBtnHtml = appPermissions.canWrite
+    ? `<button type="button" class="gold-btn" data-person="${esc(item.nrp || item.nama)}" onclick="togglePetikanGajiPanel(true, this.dataset.person)">📄 Buat Petikan Gaji</button>`
+    : '';
+
+  $('cekKartu').innerHTML = `
+    <div class="terpadu-kartu">
+      <div class="terpadu-head">
+        <div>
+          <div class="terpadu-nama">${esc(item.nama)} <span class="muted">(${esc(item.pangkat)} • NRP/NIP ${esc(item.nrp)})</span></div>
+          <div class="terpadu-sub">
+            Jenis: <strong>${esc(item.jenis || '-')}</strong> &bull; Grade: <strong>${esc(item.grade || '-')}</strong> &bull;
+            Rek BRI: <strong>${rekBriLabel}</strong> &bull; Rekening BNI: <strong>${rekBniLabel}</strong>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          ${petikanBtnHtml}
+          <div class="terpadu-ringkas-box">
+            <small>TOTAL DITERIMA (GAJI + TUNKIN)</small>
+            <b>Rp ${formatMoney(item.totalTerimaGabungan)}</b>
+          </div>
+        </div>
+      </div>
+
+      <div class="terpadu-cols">
+        <div class="sub-box">
+          <div class="sub-box-title">
+            <span>1. GAJI &amp; POTONGAN GAJI</span>
+            <span>Bersih: Rp ${formatMoney(item.gajiBersih)}</span>
+          </div>
+          <div class="rincian-grid">
+            <div class="rincian-item"><span>Gaji Mandat</span><b>Rp ${formatMoney(item.gajiMandat)}</b></div>
+            <div class="rincian-item pot"><span>Total Pot. Gaji</span><b>Rp ${formatMoney(item.potonganGaji)}</b></div>
+            <div class="rincian-item pot"><span>Pot. BRI</span><b>Rp ${formatMoney(pg.bri)}</b></div>
+            <div class="rincian-item pot"><span>Pot. Koperasi</span><b>Rp ${formatMoney(pg.koperasi)}</b></div>
+            <div class="rincian-item pot"><span>Pot. BTN</span><b>Rp ${formatMoney(pg.btn)}</b></div>
+            <div class="rincian-item pot"><span>Pot. BWS</span><b>Rp ${formatMoney(pg.bws)}</b></div>
+            <div class="rincian-item pot"><span>Suka Duka</span><b>Rp ${formatMoney(pg.sukaDuka)}</b></div>
+            <div class="rincian-item pot"><span>Pura / Islam</span><b>Rp ${formatMoney(pg.puraIslam)}</b></div>
+            <div class="rincian-item pot"><span>Pot. Polsek</span><b>Rp ${formatMoney(pg.polsek)}</b></div>
+            <div class="rincian-item pot"><span>Pot. Lain Gaji</span><b>Rp ${formatMoney(pg.potLain)}</b></div>
+            <div class="rincian-item pot"><span>Pot. PMI</span><b>Rp ${formatMoney(pg.pmi)}</b></div>
+            <div class="rincian-item pot"><span>Pot. Polwan</span><b>Rp ${formatMoney(pg.polwan)}</b></div>
+            <div class="rincian-item bersih" style="grid-column:1 / -1;"><span>Gaji Bersih Diterima</span><b>Rp ${formatMoney(item.gajiBersih)}</b></div>
+          </div>
+        </div>
+
+        <div class="sub-box">
+          <div class="sub-box-title">
+            <span>2. TUNKIN &amp; POTONGAN TUNKIN</span>
+            <span>Sisa: Rp ${formatMoney(item.sisaTunkin)}</span>
+          </div>
+          <div class="rincian-grid">
+            <div class="rincian-item"><span>Tunkin Bruto</span><b>Rp ${formatMoney(item.tunkinBruto)}</b></div>
+            <div class="rincian-item pot"><span>Pajak Tunkin (PPPK)</span><b>Rp ${formatMoney(item.pajakTunkin)}</b></div>
+            <div class="rincian-item pot"><span>Kurang Sakit/Izin</span><b>Rp ${formatMoney(item.kurangAbsen)}</b></div>
+            <div class="rincian-item"><span>Bayar Tunkin</span><b>Rp ${formatMoney(item.bayarTunkin)}</b></div>
+            <div class="rincian-item pot"><span>Total Pot. Tunkin</span><b>Rp ${formatMoney(item.totalPotTunkin)}</b></div>
+            <div class="rincian-item pot"><span>Pot. Koperasi</span><b>Rp ${formatMoney(item.potKop)}</b></div>
+            <div class="rincian-item pot"><span>Pot. Letting</span><b>Rp ${formatMoney(item.potLet)}</b></div>
+            <div class="rincian-item pot"><span>Pot. Polwan</span><b>Rp ${formatMoney(item.potPol)}</b></div>
+            <div class="rincian-item pot" style="grid-column:1 / -1;"><span>Pot. Lain Tunkin</span><b>Rp ${formatMoney(item.potLainTunkin)}</b></div>
+            <div class="rincian-item bersih" style="grid-column:1 / -1;"><span>Sisa Tunkin Diterima</span><b>Rp ${formatMoney(item.sisaTunkin)}</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ===================== MODUL PERMINTAAN TUNKIN ===================== */
+
+function createTunkin() {
+  const period = $('periodDash').value;
+  if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
+  call('createMonthlyTunkin', [period], r => {
+    msg(r.message, 'success');
+    $('viewPeriod').value = period;
+    if ($('monImpPeriode')) $('monImpPeriode').value = period;
+    if ($('pgPeriode')) $('pgPeriode').value = period;
+    switchTopMenu('mon-terpadu');
+  });
+}
+
+function arsipkanGajiBulanIni() {
+  const period = $('periodDash').value;
+  if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
+  msg(`Sedang mengarsipkan Monitoring Gaji periode ${period}...`, 'notice');
+  call('arsipkanMonitoringGajiBulanan', [period], r => {
+    msg(r.message, 'success');
+  });
+}
+
+function buatSuratTunkin() {
+  const period = $('periodDash').value;
+  if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
+  const btn = $('buatSuratBtn');
+  btn.disabled = true;
+  btn.textContent = 'Membuat Dokumen...';
+  call('buatSuratPengantarTunkin', [period], r => {
+    btn.disabled = false;
+    btn.textContent = 'Buat Surat Pengantar Pencairan (Docs)';
+    const e = $('message');
+    e.className = 'notice success';
+    e.classList.remove('hidden');
+    e.innerHTML = 'Surat berhasil dibuat: <a href="' + encodeURI(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
+  }, () => {
+    btn.disabled = false;
+    btn.textContent = 'Buat Surat Pengantar Pencairan (Docs)';
+  });
+}
+
+function buatRekapPencairan() {
+  const period = $('periodDash').value;
+  if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
+  msg('Sedang membuat Spreadsheet Rekap Pencairan Bank (4 Sheet otomatis)...', 'notice');
+  call('buatRekapPencairanBank', [period, ''], r => {
+    const e = $('message');
+    e.className = 'notice success';
+    e.classList.remove('hidden');
+    e.innerHTML = 'Rekap Pencairan Bank berhasil dibuat: <a href="' + encodeURI(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a> '
+      + '(Bayar: Rp ' + formatMoney(r.jumlahBayar) + ' | Potongan: Rp ' + formatMoney(r.jumlahPotongan) + ')';
+  });
+}
+
+function sinkronPotongan() {
+  const period = $('periodDash').value;
+  if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
+  msg('Sedang menyinkronkan potongan Koperasi & potongan tetap...', 'notice');
+  call('sinkronkanPotonganBulanan', [period], r => msg(r.message, 'success'));
+}
+
+function backupArsip() {
+  msg('Sedang membuat salinan backup spreadsheet...', 'notice');
+  call('backupArsipSpreadsheet', [''], r => {
+    const e = $('message');
+    e.className = 'notice success';
+    e.classList.remove('hidden');
+    e.innerHTML = 'Backup berhasil dibuat: <a href="' + encodeURI(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
+  });
+}
+
+let peopleSearchTimer = null;
+function schedulePeopleSearch() {
+  clearTimeout(peopleSearchTimer);
+  peopleSearchTimer = setTimeout(loadPeople, 220);
+}
+function clearPeopleSearchTimer() {
+  if (peopleSearchTimer) clearTimeout(peopleSearchTimer);
+}
+function clearPeopleSearch() {
+  clearPeopleSearchTimer();
+  $('search').value = '';
+  loadPeople();
+}
+
+function loadPeople() {
+  const q = $('search').value.trim();
+  call('searchPersonnel', [q], rows => {
+    $('peopleSearchInfo').textContent = rows.length ? `Menampilkan ${rows.length} personel aktif.` : 'Tidak ada data.';
+    $('peopleRows').innerHTML = rows.map(p =>
+      '<tr><td>' + esc(p.nrp) + '</td><td>' + esc(p.nama) + '</td><td>' + esc(p.pangkat) + '</td><td>' + esc(p.jabatan) + '</td><td>' + esc(p.grade) + '</td><td>' + esc(p.jenis) + '</td><td>'
+      + '<button type="button" class="secondary" data-nrp="' + esc(p.nrp) + '" onclick="editPerson(this.dataset.nrp)">Ubah</button> '
+      + '<button type="button" class="secondary" data-nrp="' + esc(p.nrp) + '" onclick="prepStatus(this.dataset.nrp)">Status</button></td></tr>'
+    ).join('') || '<tr><td colspan="7" class="muted">Tidak ada data.</td></tr>';
+  });
+}
+
+function autoFillRankInfo() {
+  const jenis = ($('jenis').value || '').toUpperCase();
+  if (jenis === 'PNS' || jenis === 'PPPK') return;
+  const pkt = ($('pangkat').value || '').trim().toUpperCase();
+  const info = POLRI_RANKS_CLIENT[pkt];
+  if (info) {
+    $('gol').value = info.gol;
+    $('grade').value = info.grade;
+  }
+}
+
+function editPerson(nrp) {
+  call('getPersonnel', [nrp], p => {
+    $('nama').value = p.nama;
+    $('nrp').value = p.nrp;
+    $('nrp').disabled = true;
+    $('jenis').value = p.jenis;
+    $('pangkat').value = p.pangkat;
+    $('jabatan').value = p.jabatan;
+    $('grade').value = p.grade;
+    $('gol').value = p.gol;
+    $('rekening').value = p.rekening;
+    $('formHeading').textContent = 'Ubah Personel — ' + p.nama;
+    $('savePersonBtn').textContent = 'Simpan Perubahan';
+    $('savePersonBtn').dataset.mode = 'edit';
+    showSubSection('form');
+  });
+}
+
+function resetForm() {
+  ['nama', 'nrp', 'pangkat', 'jabatan', 'grade', 'gol', 'rekening'].forEach(id => $(id).value = '');
+  $('nrp').disabled = false;
+  $('jenis').value = 'POLRI UMUM';
+  $('formHeading').textContent = 'Tambah Personel Baru';
+  $('savePersonBtn').textContent = 'Simpan Personel Baru';
+  $('savePersonBtn').dataset.mode = 'create';
+}
+
+function savePerson() {
+  const p = {
+    nama: $('nama').value,
+    nrp: $('nrp').value,
+    jenis: $('jenis').value,
+    pangkat: $('pangkat').value,
+    jabatan: $('jabatan').value,
+    grade: $('grade').value,
+    gol: $('gol').value,
+    rekening: $('rekening').value
+  };
+  const isEdit = $('savePersonBtn').dataset.mode === 'edit';
+  call(isEdit ? 'updatePersonnel' : 'savePersonnel', [p], r => {
+    msg(r.message + (r.warning ? ' — ' + r.warning : ''), 'success');
+    resetForm();
+    showSubSection('personel');
+  });
+}
+
+function prepStatus(nrp) {
+  $('stNrp').value = nrp;
+  if (!$('stTanggal').value) {
+    $('stTanggal').value = new Date().toISOString().slice(0, 10);
+  }
+  showSubSection('status');
+}
+
+function saveStatus() {
+  call('setPersonnelStatus', [{
+    nrp: $('stNrp').value,
+    status: $('stStatus').value,
+    tanggal: $('stTanggal').value,
+    alasan: $('stAlasan').value
+  }], r => {
+    msg(r.message, 'success');
+    $('stAlasan').value = '';
+  });
+}
+
+function saveDeduction() {
+  call('addDeduction', [{
+    periode: $('dPeriode').value,
+    nrp: $('dNrp').value,
+    jenis: $('dJenis').value,
+    nominal: $('dNominal').value,
+    keterangan: $('dKet').value
+  }], r => {
+    msg(r.message, 'success');
+    $('dNominal').value = '';
+    $('dKet').value = '';
+  });
+}
+
+function savePotonganTetap() {
+  call('tambahPotonganTetap', [{
+    periode: $('dPeriode').value,
+    nrp: $('dNrp').value,
+    jenis: $('dJenis').value,
+    nominal: $('dNominal').value,
+    keterangan: $('dKet').value
+  }], r => {
+    msg(r.message, 'success');
+    $('dNominal').value = '';
+    $('dKet').value = '';
+  });
+}
+
+function loadHistory() {
+  call('getHistory', [100], rows => {
+    $('historyRows').innerHTML = (rows || []).map(r =>
+      '<tr>' + r.map(c => '<td>' + esc(c) + '</td>').join('') + '</tr>'
+    ).join('') || '<tr><td colspan="8" class="muted">Belum ada riwayat.</td></tr>';
+  });
+}
+
+/* ===================== KELOLA AKUN USER (APP_AUTH) ===================== */
+
+function loadAuthAccounts() {
+  call('getAuthAccounts', [], rows => {
+    authAccountsCache = rows || [];
+    filterAuthAccountsTable();
+  });
+}
+
+function filterAuthAccountsTable() {
+  const kw = ($('accSearchInput') ? $('accSearchInput').value : '').trim().toLowerCase();
+  const filtered = authAccountsCache.filter(a => {
+    if (!kw) return true;
+    return String(a.username || '').toLowerCase().includes(kw) ||
+      String(a.nama || '').toLowerCase().includes(kw) ||
+      String(a.role || '').toLowerCase().includes(kw);
+  });
+
+  $('authAccountRows').innerHTML = filtered.slice(0, 200).map(a =>
+    `<tr>
+      <td><strong>${esc(a.username)}</strong></td>
+      <td>${esc(a.password)}</td>
+      <td>${esc(a.nama)}</td>
+      <td>${esc(a.role)}</td>
+      <td>${a.aktif ? 'AKTIF' : 'NONAKTIF'}</td>
+      <td><button type="button" class="secondary" data-user="${esc(a.username)}" onclick="fillAuthAccountForm(this.dataset.user)">Edit / Reset</button></td>
+    </tr>`
+  ).join('') || '<tr><td colspan="6" class="muted">Tidak ada akun yang cocok.</td></tr>';
+}
+
+function fillAuthAccountForm(username) {
+  const found = authAccountsCache.find(a => a.username === username);
+  if (!found) return;
+  $('accUser').value = found.username;
+  $('accPass').value = found.password;
+  $('accNama').value = found.nama;
+  $('accRole').value = found.role || 'VIEWER';
+  $('accAktif').value = found.aktif ? 'YA' : 'TIDAK';
+}
+
+function syncPersonnelAccounts() {
+  const btn = $('btnSyncAllUsers');
+  btn.disabled = true;
+  btn.textContent = 'Menyinkronkan...';
+  call('syncAllPersonnelUsers', [], res => {
+    btn.disabled = false;
+    btn.textContent = '🔄 Sinkronkan Semua Personel ke APP_AUTH';
+    msg(res.message || 'Sinkronisasi akun personel selesai.', 'success');
+    loadAuthAccounts();
+  }, () => {
+    btn.disabled = false;
+    btn.textContent = '🔄 Sinkronkan Semua Personel ke APP_AUTH';
+  });
+}
+
+function saveNewAuthAccount() {
+  call('saveAuthAccount', [{
+    username: $('accUser').value,
+    password: $('accPass').value,
+    nama: $('accNama').value,
+    role: $('accRole').value,
+    aktif: $('accAktif').value === 'YA'
+  }], r => {
+    msg(r.message, 'success');
+    $('accUser').value = '';
+    $('accPass').value = '';
+    $('accNama').value = '';
+    loadAuthAccounts();
+  });
+}
+
+/* ===================== MODUL PEMBUATAN SPPD ===================== */
+
+function loadSppdWorkspace() {
+  call('getSppdWorkspaceData', [], data => {
+    if (!data) return;
+    sppdPeopleCache = data.personel || [];
+
+    const opts = ['<option value="">-- Pilih Anggota SiKeu --</option>'].concat(
+      sppdPeopleCache.map((p, idx) =>
+        `<option value="${idx}">${esc(p.nama)} (${esc(p.pangkat)} • NRP ${esc(p.nrp)})</option>`
+      )
+    );
+    $('sppdPick1').innerHTML = opts.join('');
+    $('sppdPick2').innerHTML = opts.join('');
+
+    if (sppdPeopleCache.length && !$('sppdP1Nama').value) {
+      $('sppdPick1').value = '0';
+      applyPickedPerson(1);
+    }
+
+    if (data.nextNumbers) {
+      if (!$('sppdNoSprin').value) $('sppdNoSprin').value = data.nextNumbers.noSprin;
+      if (!$('sppdNoSpd').value) $('sppdNoSpd').value = data.nextNumbers.noSpd;
+    }
+
+    if (data.defaultDasar && !$('sppdDasar').value) {
+      $('sppdDasar').value = data.defaultDasar;
+    }
+
+    const todayIso = new Date().toISOString().slice(0, 10);
+    if (!$('sppdTglBerangkat').value) $('sppdTglBerangkat').value = todayIso;
+    if (!$('sppdTglKembali').value) $('sppdTglKembali').value = todayIso;
+    if (!$('sppdTglSprin').value) $('sppdTglSprin').value = todayIso;
+    hitungEstimasiSppd();
+
+    const pj = data.pejabat || {};
+    if (pj.KAPOLRES) {
+      $('pejKapolresJab').value = pj.KAPOLRES.jabatanResmi || 'KAPOLRES TABANAN';
+      $('pejKapolresNama').value = pj.KAPOLRES.nama || '';
+      $('pejKapolresPangkat').value = pj.KAPOLRES.pangkat || '';
+      $('pejKapolresNrp').value = pj.KAPOLRES.nrp || '';
+    }
+    if (pj.PPK) {
+      $('pejPpkJab').value = pj.PPK.jabatanResmi || 'PEJABAT PEMBUAT KOMITMEN';
+      $('pejPpkNama').value = pj.PPK.nama || '';
+      $('pejPpkPangkat').value = pj.PPK.pangkat || '';
+      $('pejPpkNrp').value = pj.PPK.nrp || '';
+    }
+    if (pj.KASIKEU) {
+      $('pejKasikeuJab').value = pj.KASIKEU.jabatanResmi || 'KEPALA SEKSI KEUANGAN';
+      $('pejKasikeuNama').value = pj.KASIKEU.nama || '';
+      $('pejKasikeuPangkat').value = pj.KASIKEU.pangkat || '';
+      $('pejKasikeuNrp').value = pj.KASIKEU.nrp || '';
+    }
+    if (pj.PEMOTONG) {
+      $('pejPemotongJab').value = pj.PEMOTONG.jabatanResmi || 'Pejabat Yang Melakukan Pemotongan';
+      $('pejPemotongNama').value = pj.PEMOTONG.nama || '';
+      $('pejPemotongPangkat').value = pj.PEMOTONG.pangkat || '';
+      $('pejPemotongNrp').value = pj.PEMOTONG.nrp || '';
+    }
+
+    $('sppdMasterRows').innerHTML = sppdPeopleCache.map((p, idx) =>
+      `<tr><td>${p.no}</td><td><strong>${esc(p.nama)}</strong></td><td>${esc(p.pangkat)}</td><td>${esc(p.nrp)}</td><td>${esc(p.jabatan)}</td><td><button type="button" class="secondary" onclick="fillMasterSppdPerson(${idx})">Edit</button></td></tr>`
+    ).join('') || '<tr><td colspan="6" class="muted">Belum ada data anggota SiKeu.</td></tr>';
+
+    $('sppdLogRows').innerHTML = (data.logs || []).map(r =>
+      `<tr>
+        <td>${esc(r[0])}</td>
+        <td>${esc(r[1])}</td>
+        <td>${esc(r[2])}</td>
+        <td>${esc(r[3])}</td>
+        <td>${esc(r[4])}</td>
+        <td>${esc(r[5])}</td>
+        <td>${esc(r[6])}</td>
+        <td>${esc(r[7])}</td>
+        <td>${esc(r[8])}</td>
+        <td class="num-col">${formatMoney(r[9])}</td>
+        <td>${r[10] ? '<a href="' + encodeURI(r[10]) + '" target="_blank" rel="noopener">Buka Docs</a>' : '-'}</td>
+        <td>${r[11] ? '<a href="' + encodeURI(r[11]) + '" target="_blank" rel="noopener">Buka Sheets</a>' : '-'}</td>
+      </tr>`
+    ).join('') || '<tr><td colspan="12" class="muted">Belum ada dokumen Sprin/SPPD yang dibuat.</td></tr>';
+  });
+}
+
+function toggleQuickAddPersonil() {
+  $('quickAddPersonilBox').classList.toggle('hidden');
+  if (!$('quickAddPersonilBox').classList.contains('hidden')) {
+    $('qPersNama').focus();
+  }
+}
+
+function saveQuickSppdPerson() {
+  const nama = $('qPersNama').value.trim();
+  const pangkat = $('qPersPangkat').value.trim();
+  const nrp = $('qPersNrp').value.trim();
+  const jabatan = $('qPersJabatan').value.trim();
+  if (!nama || !pangkat || !nrp) {
+    return msg('Nama, Pangkat, dan NRP anggota SiKeu wajib diisi.', 'error');
+  }
+  call('upsertSppdPersonel', [{ nama, pangkat, nrp, jabatan }], res => {
+    msg(res.message, 'success');
+    $('sppdP1Nama').value = nama;
+    $('sppdP1Pangkat').value = pangkat.toUpperCase();
+    $('sppdP1Nrp').value = nrp;
+    $('sppdP1Jabatan').value = jabatan;
+    $('qPersNama').value = '';
+    $('qPersPangkat').value = '';
+    $('qPersNrp').value = '';
+    $('qPersJabatan').value = '';
+    $('quickAddPersonilBox').classList.add('hidden');
+    loadSppdWorkspace();
+  });
+}
+
+function applyPickedPerson(slot) {
+  const idx = $(slot === 1 ? 'sppdPick1' : 'sppdPick2').value;
+  if (idx === '' || !sppdPeopleCache[idx]) {
+    if (slot === 2) {
+      $('sppdP2Nama').value = '';
+      $('sppdP2Pangkat').value = '';
+      $('sppdP2Nrp').value = '';
+      $('sppdP2Jabatan').value = '';
+      hitungEstimasiSppd();
+    }
+    return;
+  }
+  const p = sppdPeopleCache[idx];
+  if (slot === 1) {
+    $('sppdP1Nama').value = p.nama;
+    $('sppdP1Pangkat').value = p.pangkat;
+    $('sppdP1Nrp').value = p.nrp;
+    $('sppdP1Jabatan').value = p.jabatan;
+  } else {
+    $('sppdP2Nama').value = p.nama;
+    $('sppdP2Pangkat').value = p.pangkat;
+    $('sppdP2Nrp').value = p.nrp;
+    $('sppdP2Jabatan').value = p.jabatan;
+  }
+  hitungEstimasiSppd();
+}
+
+function fillMasterSppdPerson(idx) {
+  const p = sppdPeopleCache[idx];
+  if (!p) return;
+  $('mPersNama').value = p.nama;
+  $('mPersPangkat').value = p.pangkat;
+  $('mPersNrp').value = p.nrp;
+  $('mPersJabatan').value = p.jabatan;
+}
+
+function saveMasterSppdPerson() {
+  call('upsertSppdPersonel', [{
+    nama: $('mPersNama').value,
+    pangkat: $('mPersPangkat').value,
+    nrp: $('mPersNrp').value,
+    jabatan: $('mPersJabatan').value
+  }], r => {
+    msg(r.message, 'success');
+    loadSppdWorkspace();
+  });
+}
+
+function syncSppdHari() {
+  const b = $('sppdTglBerangkat').value;
+  const k = $('sppdTglKembali').value;
+  if (b && k) {
+    const d1 = new Date(b + 'T00:00:00');
+    const d2 = new Date(k + 'T00:00:00');
+    const diff = Math.round((d2 - d1) / 86400000) + 1;
+    if (diff >= 1) $('sppdLamaHari').value = diff;
+  }
+  hitungEstimasiSppd();
+}
+
+function hitungEstimasiSppd() {
+  const hari = Math.max(parseInt($('sppdLamaHari').value, 10) || 1, 1);
+  const tarif = Math.max(parseInt($('sppdUangHarian').value, 10) || 0, 0);
+  const ada2 = !!$('sppdP2Nama').value.trim();
+  const org = ada2 ? 2 : 1;
+  const total = hari * tarif * org;
+  $('sppdCalcSummary').textContent =
+    `Estimasi Biaya: ${org} Personil × ${hari} Hari × Rp ${formatMoney(tarif)} = Rp ${formatMoney(total)}`;
+}
+
+function collectPejabatPayload() {
+  return {
+    KAPOLRES: {
+      jabatanResmi: $('pejKapolresJab').value,
+      nama: $('pejKapolresNama').value,
+      pangkat: $('pejKapolresPangkat').value,
+      nrp: $('pejKapolresNrp').value
+    },
+    PPK: {
+      jabatanResmi: $('pejPpkJab').value,
+      nama: $('pejPpkNama').value,
+      pangkat: $('pejPpkPangkat').value,
+      nrp: $('pejPpkNrp').value
+    },
+    KASIKEU: {
+      jabatanResmi: $('pejKasikeuJab').value,
+      nama: $('pejKasikeuNama').value,
+      pangkat: $('pejKasikeuPangkat').value,
+      nrp: $('pejKasikeuNrp').value
+    },
+    PEMOTONG: {
+      jabatanResmi: $('pejPemotongJab').value,
+      nama: $('pejPemotongNama').value,
+      pangkat: $('pejPemotongPangkat').value,
+      nrp: $('pejPemotongNrp').value
+    }
+  };
+}
+
+function savePejabatForm() {
+  call('savePejabatSppd', [collectPejabatPayload()], r => msg(r.message, 'success'));
+}
+
+function generateSppdDoc() {
+  const payload = {
+    noSprin: $('sppdNoSprin').value,
+    noSpd: $('sppdNoSpd').value,
+    akun: $('sppdAkun').value,
+    uangHarian: $('sppdUangHarian').value,
+    kegiatan: $('sppdKegiatan').value,
+    tempatTujuan: $('sppdTempatTujuan').value,
+    tempatBerangkat: $('sppdTempatBerangkat').value,
+    alatAngkut: $('sppdAlatAngkut').value,
+    tglBerangkat: $('sppdTglBerangkat').value,
+    tglKembali: $('sppdTglKembali').value,
+    lamaHari: $('sppdLamaHari').value,
+    tglSprin: $('sppdTglSprin').value,
+    dasarSprin: $('sppdDasar').value,
+    updateMasterPersonil: $('sppdSavePersonUpdate').checked,
+    personil1: {
+      nama: $('sppdP1Nama').value,
+      pangkat: $('sppdP1Pangkat').value,
+      nrp: $('sppdP1Nrp').value,
+      jabatan: $('sppdP1Jabatan').value
+    },
+    personil2: {
+      nama: $('sppdP2Nama').value,
+      pangkat: $('sppdP2Pangkat').value,
+      nrp: $('sppdP2Nrp').value,
+      jabatan: $('sppdP2Jabatan').value
+    },
+    pejabat: collectPejabatPayload()
+  };
+
+  msg('Sedang membuat Sprin (Google Docs) dan SPD & Nominatif (Google Sheets)...', 'notice');
+  call('buatSprinDanSppd', [payload], res => {
+    const e = $('message');
+    e.className = 'notice success';
+    e.classList.remove('hidden');
+    e.innerHTML = esc(res.message) + '<br>'
+      + '• <a href="' + encodeURI(res.sprinUrl) + '" target="_blank" rel="noopener"><strong>Buka Sprin (Google Docs)</strong></a> &nbsp;|&nbsp; '
+      + '• <a href="' + encodeURI(res.spdUrl) + '" target="_blank" rel="noopener"><strong>Buka SPD &amp; Nominatif (Google Sheets)</strong></a>';
+    $('sppdNoSprin').value = '';
+    $('sppdNoSpd').value = '';
+    loadSppdWorkspace();
+  });
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+setupExcelDropzones();
+setupMonFileDropzone();
+init();
+</script>
+</body>
+</html>
