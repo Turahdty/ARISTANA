@@ -4257,3 +4257,282 @@ init();
 </script>
 </body>
 </html>
+">${esc(p.nama)} (${esc(p.pangkat)} • NRP ${esc(p.nrp)})</option>`
+      )
+    );
+    $('sppdPick1').innerHTML = opts.join('');
+    $('sppdPick2').innerHTML = opts.join('');
+
+    if (sppdPeopleCache.length && !$('sppdP1Nama').value) {
+      $('sppdPick1').value = '0';
+      applyPickedPerson(1);
+    }
+
+    if (data.nextNumbers) {
+      if (!$('sppdNoSprin').value) $('sppdNoSprin').value = data.nextNumbers.noSprin;
+      if (!$('sppdNoSpd').value) $('sppdNoSpd').value = data.nextNumbers.noSpd;
+    }
+
+    if (data.defaultDasar && !$('sppdDasar').value) {
+      $('sppdDasar').value = data.defaultDasar;
+    }
+
+    const todayIso = new Date().toISOString().slice(0, 10);
+    if (!$('sppdTglBerangkat').value) $('sppdTglBerangkat').value = todayIso;
+    if (!$('sppdTglKembali').value) $('sppdTglKembali').value = todayIso;
+    if (!$('sppdTglSprin').value) $('sppdTglSprin').value = todayIso;
+    hitungEstimasiSppd();
+
+    const pj = data.pejabat || {};
+    if (pj.KAPOLRES) {
+      $('pejKapolresJab').value = pj.KAPOLRES.jabatanResmi || 'KAPOLRES TABANAN';
+      $('pejKapolresNama').value = pj.KAPOLRES.nama || '';
+      $('pejKapolresPangkat').value = pj.KAPOLRES.pangkat || '';
+      $('pejKapolresNrp').value = pj.KAPOLRES.nrp || '';
+    }
+    if (pj.PPK) {
+      $('pejPpkJab').value = pj.PPK.jabatanResmi || 'PEJABAT PEMBUAT KOMITMEN';
+      $('pejPpkNama').value = pj.PPK.nama || '';
+      $('pejPpkPangkat').value = pj.PPK.pangkat || '';
+      $('pejPpkNrp').value = pj.PPK.nrp || '';
+    }
+    if (pj.KASIKEU) {
+      $('pejKasikeuJab').value = pj.KASIKEU.jabatanResmi || 'KEPALA SEKSI KEUANGAN';
+      $('pejKasikeuNama').value = pj.KASIKEU.nama || '';
+      $('pejKasikeuPangkat').value = pj.KASIKEU.pangkat || '';
+      $('pejKasikeuNrp').value = pj.KASIKEU.nrp || '';
+    }
+    if (pj.PEMOTONG) {
+      $('pejPemotongJab').value = pj.PEMOTONG.jabatanResmi || 'Pejabat Yang Melakukan Pemotongan';
+      $('pejPemotongNama').value = pj.PEMOTONG.nama || '';
+      $('pejPemotongPangkat').value = pj.PEMOTONG.pangkat || '';
+      $('pejPemotongNrp').value = pj.PEMOTONG.nrp || '';
+    }
+
+    $('sppdMasterRows').innerHTML = sppdPeopleCache.map((p, idx) =>
+      `<tr><td>${p.no}</td><td><strong>${esc(p.nama)}</strong></td><td>${esc(p.pangkat)}</td><td>${esc(p.nrp)}</td><td>${esc(p.jabatan)}</td><td><button type="button" class="secondary" onclick="fillMasterSppdPerson(${idx})">Edit</button></td></tr>`
+    ).join('') || '<tr><td colspan="6" class="muted">Belum ada data anggota SiKeu.</td></tr>';
+
+    $('sppdLogRows').innerHTML = (data.logs || []).map(r =>
+      `<tr>
+        <td>${esc(r[0])}</td>
+        <td>${esc(r[1])}</td>
+        <td>${esc(r[2])}</td>
+        <td>${esc(r[3])}</td>
+        <td>${esc(r[4])}</td>
+        <td>${esc(r[5])}</td>
+        <td>${esc(r[6])}</td>
+        <td>${esc(r[7])}</td>
+        <td>${esc(r[8])}</td>
+        <td class="num-col">${formatMoney(r[9])}</td>
+        <td>${r[10] ? '<a href="' + safeUrl(r[10]) + '" target="_blank" rel="noopener">Buka Docs</a>' : '-'}</td>
+        <td>${r[11] ? '<a href="' + safeUrl(r[11]) + '" target="_blank" rel="noopener">Buka Sheets</a>' : '-'}</td>
+      </tr>`
+    ).join('') || '<tr><td colspan="12" class="muted">Belum ada dokumen Sprin/SPPD yang dibuat.</td></tr>';
+  });
+}
+
+function toggleQuickAddPersonil() {
+  $('quickAddPersonilBox').classList.toggle('hidden');
+  if (!$('quickAddPersonilBox').classList.contains('hidden')) {
+    $('qPersNama').focus();
+  }
+}
+
+function saveQuickSppdPerson() {
+  const nama = $('qPersNama').value.trim();
+  const pangkat = $('qPersPangkat').value.trim();
+  const nrp = $('qPersNrp').value.trim();
+  const jabatan = $('qPersJabatan').value.trim();
+  if (!nama || !pangkat || !nrp) {
+    return msg('Nama, Pangkat, dan NRP anggota SiKeu wajib diisi.', 'error');
+  }
+  call('upsertSppdPersonel', [{ nama, pangkat, nrp, jabatan }], res => {
+    msg(res.message, 'success');
+    $('sppdP1Nama').value = nama;
+    $('sppdP1Pangkat').value = pangkat.toUpperCase();
+    $('sppdP1Nrp').value = nrp;
+    $('sppdP1Jabatan').value = jabatan;
+    $('qPersNama').value = '';
+    $('qPersPangkat').value = '';
+    $('qPersNrp').value = '';
+    $('qPersJabatan').value = '';
+    $('quickAddPersonilBox').classList.add('hidden');
+    loadSppdWorkspace();
+  });
+}
+
+function applyPickedPerson(slot) {
+  const idx = $(slot === 1 ? 'sppdPick1' : 'sppdPick2').value;
+  if (idx === '' || !sppdPeopleCache[idx]) {
+    if (slot === 2) {
+      $('sppdP2Nama').value = '';
+      $('sppdP2Pangkat').value = '';
+      $('sppdP2Nrp').value = '';
+      $('sppdP2Jabatan').value = '';
+      hitungEstimasiSppd();
+    }
+    return;
+  }
+  const p = sppdPeopleCache[idx];
+  if (slot === 1) {
+    $('sppdP1Nama').value = p.nama;
+    $('sppdP1Pangkat').value = p.pangkat;
+    $('sppdP1Nrp').value = p.nrp;
+    $('sppdP1Jabatan').value = p.jabatan;
+  } else {
+    $('sppdP2Nama').value = p.nama;
+    $('sppdP2Pangkat').value = p.pangkat;
+    $('sppdP2Nrp').value = p.nrp;
+    $('sppdP2Jabatan').value = p.jabatan;
+  }
+  hitungEstimasiSppd();
+}
+
+function fillMasterSppdPerson(idx) {
+  const p = sppdPeopleCache[idx];
+  if (!p) return;
+  $('mPersNama').value = p.nama;
+  $('mPersPangkat').value = p.pangkat;
+  $('mPersNrp').value = p.nrp;
+  $('mPersJabatan').value = p.jabatan;
+}
+
+function saveMasterSppdPerson() {
+  call('upsertSppdPersonel', [{
+    nama: $('mPersNama').value,
+    pangkat: $('mPersPangkat').value,
+    nrp: $('mPersNrp').value,
+    jabatan: $('mPersJabatan').value
+  }], r => {
+    msg(r.message, 'success');
+    loadSppdWorkspace();
+  });
+}
+
+function syncSppdHari() {
+  const b = $('sppdTglBerangkat').value;
+  const k = $('sppdTglKembali').value;
+  if (b && k) {
+    const d1 = new Date(b + 'T00:00:00');
+    const d2 = new Date(k + 'T00:00:00');
+    const diff = Math.round((d2 - d1) / 86400000) + 1;
+    if (diff >= 1) $('sppdLamaHari').value = diff;
+  }
+  hitungEstimasiSppd();
+}
+
+function hitungEstimasiSppd() {
+  const hari = Math.max(parseInt($('sppdLamaHari').value, 10) || 1, 1);
+  const tarif = Math.max(parseInt($('sppdUangHarian').value, 10) || 0, 0);
+  const ada2 = !!$('sppdP2Nama').value.trim();
+  const org = ada2 ? 2 : 1;
+  const total = hari * tarif * org;
+  $('sppdCalcSummary').textContent =
+    `Estimasi Biaya: ${org} Personil × ${hari} Hari × Rp ${formatMoney(tarif)} = Rp ${formatMoney(total)}`;
+}
+
+function collectPejabatPayload() {
+  return {
+    KAPOLRES: {
+      jabatanResmi: $('pejKapolresJab').value,
+      nama: $('pejKapolresNama').value,
+      pangkat: $('pejKapolresPangkat').value,
+      nrp: $('pejKapolresNrp').value
+    },
+    PPK: {
+      jabatanResmi: $('pejPpkJab').value,
+      nama: $('pejPpkNama').value,
+      pangkat: $('pejPpkPangkat').value,
+      nrp: $('pejPpkNrp').value
+    },
+    KASIKEU: {
+      jabatanResmi: $('pejKasikeuJab').value,
+      nama: $('pejKasikeuNama').value,
+      pangkat: $('pejKasikeuPangkat').value,
+      nrp: $('pejKasikeuNrp').value
+    },
+    PEMOTONG: {
+      jabatanResmi: $('pejPemotongJab').value,
+      nama: $('pejPemotongNama').value,
+      pangkat: $('pejPemotongPangkat').value,
+      nrp: $('pejPemotongNrp').value
+    }
+  };
+}
+
+function savePejabatForm() {
+  call('savePejabatSppd', [collectPejabatPayload()], r => msg(r.message, 'success'));
+}
+
+function generateSppdDoc() {
+  const payload = {
+    noSprin: $('sppdNoSprin').value,
+    noSpd: $('sppdNoSpd').value,
+    akun: $('sppdAkun').value,
+    uangHarian: $('sppdUangHarian').value,
+    kegiatan: $('sppdKegiatan').value,
+    tempatTujuan: $('sppdTempatTujuan').value,
+    tempatBerangkat: $('sppdTempatBerangkat').value,
+    alatAngkut: $('sppdAlatAngkut').value,
+    tglBerangkat: $('sppdTglBerangkat').value,
+    tglKembali: $('sppdTglKembali').value,
+    lamaHari: $('sppdLamaHari').value,
+    tglSprin: $('sppdTglSprin').value,
+    dasarSprin: $('sppdDasar').value,
+    updateMasterPersonil: $('sppdSavePersonUpdate').checked,
+    personil1: {
+      nama: $('sppdP1Nama').value,
+      pangkat: $('sppdP1Pangkat').value,
+      nrp: $('sppdP1Nrp').value,
+      jabatan: $('sppdP1Jabatan').value
+    },
+    personil2: {
+      nama: $('sppdP2Nama').value,
+      pangkat: $('sppdP2Pangkat').value,
+      nrp: $('sppdP2Nrp').value,
+      jabatan: $('sppdP2Jabatan').value
+    },
+    pejabat: collectPejabatPayload()
+  };
+
+  msg('Sedang membuat Sprin (Google Docs) dan SPD & Nominatif (Google Sheets)...', 'notice');
+  call('buatSprinDanSppd', [payload], res => {
+    const e = $('message');
+    e.className = 'notice success';
+    e.classList.remove('hidden');
+    e.innerHTML = esc(res.message) + '<br>'
+      + '• <a href="' + safeUrl(res.sprinUrl) + '" target="_blank" rel="noopener"><strong>Buka Sprin (Google Docs)</strong></a> &nbsp;|&nbsp; '
+      + '• <a href="' + safeUrl(res.spdUrl) + '" target="_blank" rel="noopener"><strong>Buka SPD &amp; Nominatif (Google Sheets)</strong></a>';
+    $('sppdNoSprin').value = '';
+    $('sppdNoSpd').value = '';
+    loadSppdWorkspace();
+  });
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+
+// Auto-logout jika tidak ada aktivitas selama 30 menit
+let idleTimer = null;
+function resetIdleTimer() {
+  if (!authToken) return;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    logoutSession();
+    $('loginMsg').textContent = 'Sesi berakhir otomatis karena tidak ada aktivitas selama 30 menit. Silakan login kembali.';
+    $('loginMsg').classList.remove('hidden');
+  }, 30 * 60 * 1000);
+}
+['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt => {
+  document.addEventListener(evt, resetIdleTimer, { passive: true });
+});
+
+setupExcelDropzones();
+setupMonFileDropzone();
+init();
+</script>
+</body>
+</html>
