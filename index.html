@@ -2,6 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://script.google.com https://script.googleusercontent.com https://cdn.jsdelivr.net https://drive.google.com https://lh3.googleusercontent.com 'unsafe-inline' 'unsafe-eval' data: blob:; img-src * data: blob:; connect-src https://script.google.com https://script.googleusercontent.com;">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
   <title>ARISTANA ADMINISTRASI KEUANGAN TERINTEGRASI POLRES TABANAN</title>
   <!-- SheetJS untuk membaca file Excel (.xlsx / .xls / .csv) langsung di browser -->
@@ -1992,6 +1994,24 @@
 <script>
 const $ = id => document.getElementById(id);
 
+// ================= PENGUATAN KEAMANAN FRONTEND =================
+(function() {
+  try {
+    if (window.top !== window.self) {
+      window.top.location = window.self.location;
+    }
+  } catch (e) {}
+})();
+
+function safeUrl(u) {
+  const s = String(u || '').trim();
+  if (/^https:\/\/(docs|drive|sheets|script)\.google\.com\//i.test(s) || /^https:\/\/[a-z0-9-]+\.googleusercontent\.com\//i.test(s)) {
+    return encodeURI(s);
+  }
+  return '#';
+}
+
+
 let authToken = sessionStorage.getItem('aristana_token') || '';
 let appPermissions = { canView: false, canWrite: false, canManageUsers: false, readOnly: true };
 let currentUserInfo = null;
@@ -2118,7 +2138,13 @@ async function runGasApi(fn, fullArgs) {
     throw new Error('Respons server tidak valid. Pastikan Web App GAS sudah di-deploy ulang dengan doPost(e) & akses Anyone.');
   }
   if (!parsed || parsed.ok === false) {
-    throw new Error((parsed && parsed.error) || 'Permintaan ke backend Google Apps Script gagal.');
+    const errMsg = (parsed && parsed.error) || 'Permintaan ke backend Google Apps Script gagal.';
+    if (/sesi.*(tidak valid|kedaluwarsa|habis|login ulang)/i.test(errMsg) && authToken) {
+      logoutSession();
+      $('loginMsg').textContent = errMsg;
+      $('loginMsg').classList.remove('hidden');
+    }
+    throw new Error(errMsg);
   }
   return parsed.data;
 }
@@ -3110,7 +3136,7 @@ function transferPetikanToSheet() {
         const e = $('message');
         e.className = 'notice success';
         e.classList.remove('hidden');
-        e.innerHTML = 'Berhasil transfer ke Template Petikan Gaji: <a href="' + encodeURI(res.url) + '" target="_blank" rel="noopener"><strong>' + esc(res.name) + '</strong></a>';
+        e.innerHTML = 'Berhasil transfer ke Template Petikan Gaji: <a href="' + safeUrl(res.url) + '" target="_blank" rel="noopener"><strong>' + esc(res.name) + '</strong></a>';
       }
     })
     .catch(err => {
@@ -3695,7 +3721,7 @@ function buatSuratTunkin() {
     const e = $('message');
     e.className = 'notice success';
     e.classList.remove('hidden');
-    e.innerHTML = 'Surat berhasil dibuat: <a href="' + encodeURI(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
+    e.innerHTML = 'Surat berhasil dibuat: <a href="' + safeUrl(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
   }, () => {
     btn.disabled = false;
     btn.textContent = 'Buat Surat Pengantar Pencairan (Docs)';
@@ -3710,7 +3736,7 @@ function buatRekapPencairan() {
     const e = $('message');
     e.className = 'notice success';
     e.classList.remove('hidden');
-    e.innerHTML = 'Rekap Pencairan Bank berhasil dibuat: <a href="' + encodeURI(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a> '
+    e.innerHTML = 'Rekap Pencairan Bank berhasil dibuat: <a href="' + safeUrl(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a> '
       + '(Bayar: Rp ' + formatMoney(r.jumlahBayar) + ' | Potongan: Rp ' + formatMoney(r.jumlahPotongan) + ')';
   });
 }
@@ -3728,7 +3754,7 @@ function backupArsip() {
     const e = $('message');
     e.className = 'notice success';
     e.classList.remove('hidden');
-    e.innerHTML = 'Backup berhasil dibuat: <a href="' + encodeURI(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
+    e.innerHTML = 'Backup berhasil dibuat: <a href="' + safeUrl(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
   });
 }
 
@@ -3892,7 +3918,7 @@ function filterAuthAccountsTable() {
   $('authAccountRows').innerHTML = filtered.slice(0, 200).map(a =>
     `<tr>
       <td><strong>${esc(a.username)}</strong></td>
-      <td>${esc(a.password)}</td>
+      <td>${a.password ? '••••••••' : '<span class="muted">(Kosong)</span>'}</td>
       <td>${esc(a.nama)}</td>
       <td>${esc(a.role)}</td>
       <td>${a.aktif ? 'AKTIF' : 'NONAKTIF'}</td>
@@ -3905,7 +3931,8 @@ function fillAuthAccountForm(username) {
   const found = authAccountsCache.find(a => a.username === username);
   if (!found) return;
   $('accUser').value = found.username;
-  $('accPass').value = found.password;
+  $('accPass').value = '';
+  $('accPass').placeholder = 'Isi password baru (kosongkan jika tidak diubah)';
   $('accNama').value = found.nama;
   $('accRole').value = found.role || 'VIEWER';
   $('accAktif').value = found.aktif ? 'YA' : 'TIDAK';
@@ -4019,8 +4046,8 @@ function loadSppdWorkspace() {
         <td>${esc(r[7])}</td>
         <td>${esc(r[8])}</td>
         <td class="num-col">${formatMoney(r[9])}</td>
-        <td>${r[10] ? '<a href="' + encodeURI(r[10]) + '" target="_blank" rel="noopener">Buka Docs</a>' : '-'}</td>
-        <td>${r[11] ? '<a href="' + encodeURI(r[11]) + '" target="_blank" rel="noopener">Buka Sheets</a>' : '-'}</td>
+        <td>${r[10] ? '<a href="' + safeUrl(r[10]) + '" target="_blank" rel="noopener">Buka Docs</a>' : '-'}</td>
+        <td>${r[11] ? '<a href="' + safeUrl(r[11]) + '" target="_blank" rel="noopener">Buka Sheets</a>' : '-'}</td>
       </tr>`
     ).join('') || '<tr><td colspan="12" class="muted">Belum ada dokumen Sprin/SPPD yang dibuat.</td></tr>';
   });
@@ -4196,8 +4223,8 @@ function generateSppdDoc() {
     e.className = 'notice success';
     e.classList.remove('hidden');
     e.innerHTML = esc(res.message) + '<br>'
-      + '• <a href="' + encodeURI(res.sprinUrl) + '" target="_blank" rel="noopener"><strong>Buka Sprin (Google Docs)</strong></a> &nbsp;|&nbsp; '
-      + '• <a href="' + encodeURI(res.spdUrl) + '" target="_blank" rel="noopener"><strong>Buka SPD &amp; Nominatif (Google Sheets)</strong></a>';
+      + '• <a href="' + safeUrl(res.sprinUrl) + '" target="_blank" rel="noopener"><strong>Buka Sprin (Google Docs)</strong></a> &nbsp;|&nbsp; '
+      + '• <a href="' + safeUrl(res.spdUrl) + '" target="_blank" rel="noopener"><strong>Buka SPD &amp; Nominatif (Google Sheets)</strong></a>';
     $('sppdNoSprin').value = '';
     $('sppdNoSpd').value = '';
     loadSppdWorkspace();
@@ -4207,6 +4234,22 @@ function generateSppdDoc() {
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 }
+
+
+// Auto-logout jika tidak ada aktivitas selama 30 menit
+let idleTimer = null;
+function resetIdleTimer() {
+  if (!authToken) return;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    logoutSession();
+    $('loginMsg').textContent = 'Sesi berakhir otomatis karena tidak ada aktivitas selama 30 menit. Silakan login kembali.';
+    $('loginMsg').classList.remove('hidden');
+  }, 30 * 60 * 1000);
+}
+['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt => {
+  document.addEventListener(evt, resetIdleTimer, { passive: true });
+});
 
 setupExcelDropzones();
 setupMonFileDropzone();
