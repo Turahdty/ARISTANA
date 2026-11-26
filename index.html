@@ -884,7 +884,6 @@
         <label>Tempel (Ctrl+V) Langsung Tabel Monitoring Gaji dari Excel (Kolom: NO, NRP, NAMA, PANGKAT, GAJI MANDAT, BRI, KOPERASI, BTN, BWS, SUKA-DUKA, PURA/ISLAM, POLSEK, POT LAIN, PMI, POLWAN, JML POTONGAN, BAYAR)</label>
         <textarea id="pasteMonGajiText" class="paste-area" placeholder="Blok tabel Monitoring Gaji di Excel -> tekan Ctrl+C -> klik di kotak ini -> tekan Ctrl+V, lalu klik tombol Proses & Simpan Monitoring Gaji..."></textarea>
 
-        <div id="previewMonGaji" class="small" style="margin-top:8px;font-weight:700;color:#14532d;"></div>
         <div class="row" style="margin-top:10px;">
           <button id="btnSubmitMonGaji" class="btn ok" onclick="submitMonitoringGajiGabungan()">Proses &amp; Simpan Monitoring Gaji ke Database</button>
           <button type="button" class="btn sec sm" onclick="document.getElementById('pasteMonGajiText').value='';document.getElementById('fileMonGaji').value='';">Bersihkan Kotak</button>
@@ -2010,31 +2009,17 @@ async function loadImportInfo() {
   }
 }
 
-function detectPeriodFromMatrix_(rows) {
-  if (!Array.isArray(rows)) return '';
-  for (let r = 0; r < Math.min(rows.length, 15); r++) {
-    const row = rows[r];
-    if (!Array.isArray(row)) continue;
-    for (let c = 0; c < Math.min(row.length, 6); c++) {
-      const val = String(row[c] || '').trim();
-      const m = val.match(/^(20\d{2})[-\/](0[1-9]|1[0-2])$/);
-      if (m) return m[1] + '-' + m[2];
-    }
-  }
-  return '';
-}
-
 function onSelectExcelFile(type) {
   const inputId = type === 'POLRI' ? 'filePolri' : (type === 'PNS' ? 'filePns' : 'fileMonGaji');
-  const prevId = type === 'POLRI' ? 'previewPolri' : (type === 'PNS' ? 'previewPns' : 'previewMonGaji');
+  const prevId = type === 'POLRI' ? 'previewPolri' : (type === 'PNS' ? 'previewPns' : null);
   const fileInput = $(inputId);
-  if (prevId && $(prevId)) $(prevId).textContent = '';
+  if (prevId) $(prevId).textContent = '';
   IMPORT_CACHE[type] = null;
 
   const file = fileInput.files && fileInput.files[0];
   if (!file) return;
 
-  if (prevId && $(prevId)) $(prevId).textContent = `Membaca file "${file.name}"...`;
+  if (prevId) $(prevId).textContent = `Membaca file "${file.name}"...`;
 
   const reader = new FileReader();
   reader.onload = function(evt) {
@@ -2047,28 +2032,22 @@ function onSelectExcelFile(type) {
         const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
         const cleanRows = rows.filter(r => Array.isArray(r) && r.some(c => String(c || '').trim() !== ''));
         IMPORT_CACHE[type] = { fileName: file.name, rows: cleanRows };
-
-        if (type === 'MON_GAJI') {
-          const detectedPer = detectPeriodFromMatrix_(cleanRows);
-          if (detectedPer && $('impMonGajiPeriod')) {
-            $('impMonGajiPeriod').value = detectedPer;
-          }
+        if (prevId) {
+          const colCount = cleanRows[0] ? cleanRows[0].length : 0;
+          $(prevId).textContent = `Siap diimpor: "${file.name}" (${cleanRows.length} baris, ${colCount} kolom dari sheet "${firstSheetName}").`;
+        } else {
+          toast(`File "${file.name}" (${cleanRows.length} baris) siap diproses.`, 'ok');
         }
-
-        const colCount = cleanRows[0] ? cleanRows[0].length : 0;
-        const msg = `Siap diimpor: "${file.name}" (${cleanRows.length} baris terbaca dari sheet "${firstSheetName}").`;
-        if (prevId && $(prevId)) $(prevId).textContent = msg;
-        toast(msg, 'ok');
       } else {
         const r2 = new FileReader();
         r2.onload = e2 => {
           IMPORT_CACHE[type] = { fileName: file.name, base64Data: e2.target.result };
-          if (prevId && $(prevId)) $(prevId).textContent = `Siap diimpor: "${file.name}" (mode server).`;
+          if (prevId) $(prevId).textContent = `Siap diimpor: "${file.name}" (mode server).`;
         };
         r2.readAsDataURL(file);
       }
     } catch (err) {
-      if (prevId && $(prevId)) $(prevId).textContent = 'Gagal membaca file: ' + err.message;
+      if (prevId) $(prevId).textContent = 'Gagal membaca file: ' + err.message;
       toast('Gagal membaca file Excel: ' + err.message, 'err');
     }
   };
@@ -2106,14 +2085,12 @@ async function submitMonitoringGajiGabungan() {
     $('importResultBox').classList.remove('hide');
     $('pasteMonGajiText').value = '';
     $('fileMonGaji').value = '';
-    if ($('previewMonGaji')) $('previewMonGaji').textContent = '';
     IMPORT_CACHE['MON_GAJI'] = null;
     await loadImportInfo();
     BOOT = await runGas('getBootstrap', [getToken()]);
     populatePeriodDropdown(BOOT.availablePeriods, period);
     $('dashPeriod').value = period;
     $('dashPeriodSelect').value = period;
-    await loadMonitoringTerpadu();
   } catch (e) {
     toast(e.message, 'err');
   } finally {
