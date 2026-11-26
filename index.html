@@ -2511,6 +2511,7 @@ function init(refreshTab = false) {
       return;
     }
 
+    resetIdleTimer();
     showMainAppOnly();
     appPermissions = d.permissions;
     currentUserInfo = d.user;
@@ -4234,7 +4235,6 @@ function generateSppdDoc() {
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 }
-
 
 // Auto-logout jika tidak ada aktivitas selama 30 menit
 let idleTimer = null;
