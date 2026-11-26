@@ -545,6 +545,17 @@
       font-size: 12.5px;
     }
     button.gold-btn:hover { filter: brightness(0.96); }
+    button.danger-btn {
+      background: #dc2626;
+      color: #fff;
+      border: 0;
+      border-radius: 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 11.5px;
+    }
+    button.danger-btn:hover { background: #b91c1c; }
 
     /* PANEL IMPORT / COPAS MONITORING GAJI (ADMIN & OPERATOR) */
     .mon-import-panel {
@@ -675,6 +686,19 @@
       background: var(--sakti-red-bg);
       border-color: #fca5a5;
       color: #991b1b;
+    }
+
+    /* BADGE FALLBACK POTONGAN TUNKIN */
+    .fallback-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+      margin-left: 4px;
     }
 
     /* PANEL PETIKAN GAJI (ADMIN & OPERATOR) */
@@ -1018,6 +1042,88 @@
     .rincian-item.bersih { background: var(--sakti-green-bg); border-color: #bbf7d0; }
     .rincian-item.bersih b { color: var(--sakti-green); font-size: 12.5px; }
 
+    /* MODUL PERHITUNGAN PAJAK BULANAN (POLRES TABANAN & POLSEK JAJARAN) */
+    .pajak-calc-box {
+      background: #f8fbff;
+      border: 1.5px solid #bfdbfe;
+      border-left: 4px solid var(--sakti-blue);
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .pajak-live-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .pajak-live-cell {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      padding: 7px 9px;
+    }
+    .pajak-live-cell span {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--sakti-muted);
+      text-transform: uppercase;
+    }
+    .pajak-live-cell b {
+      display: block;
+      font-size: 13.5px;
+      margin-top: 2px;
+      font-family: 'Consolas', monospace;
+      color: var(--sakti-navy);
+    }
+    .pajak-live-cell.total {
+      background: #ecfdf3;
+      border-color: #86efac;
+    }
+    .pajak-live-cell.total b {
+      color: var(--sakti-green);
+      font-size: 14px;
+    }
+    .badge-metode {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+    .badge-metode.cash {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+    .badge-metode.cms {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+    }
+    .pajak-group-row td {
+      background: #e2e8f0 !important;
+      color: #0f172a !important;
+      font-weight: 800 !important;
+      text-transform: uppercase;
+      font-size: 11.5px;
+    }
+    .pajak-subtotal-row td {
+      background: #f1f5f9 !important;
+      color: var(--sakti-navy) !important;
+      font-weight: 700 !important;
+      border-top: 1.5px solid #94a3b8;
+      border-bottom: 1.5px solid #94a3b8;
+    }
+    .pajak-grandtotal-row td {
+      background: var(--sakti-navy) !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      border-top: 2px solid var(--sakti-gold);
+    }
+
     /* TABEL */
     .tablewrap {
       overflow-x: auto;
@@ -1166,6 +1272,7 @@
       }
       .sakti-sidebar.open { transform: translateX(0); }
       .terpadu-cols, .grid-2-import { grid-template-columns: 1fr; }
+      .pajak-live-strip { grid-template-columns: repeat(3, minmax(110px, 1fr)); }
     }
 
     @media (max-width: 768px) {
@@ -1175,6 +1282,7 @@
       .sakti-menubar { padding: 0 8px; }
       .sakti-mod-btn { padding: 9px 11px; font-size: 12px; }
       .grid-4 { grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 8px; }
+      .pajak-live-strip { grid-template-columns: repeat(2, minmax(110px, 1fr)); }
       .sakti-content { padding: 12px 10px; }
       .card { padding: 13px 11px; }
       .table-scroll-hint { display: flex; }
@@ -1192,7 +1300,7 @@
       <div class="login-card-main">
         <div class="login-card-header">
           <div class="login-logo-circle">
-            <img src="Puskeu.png"" alt="Logo Keuangan Polri" referrerpolicy="no-referrer"
+            <img src="Puskeu.png" alt="Logo Keuangan Polri" referrerpolicy="no-referrer"
                  onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/1Z-3fhgw94F-Geg4rwQX4zd6KzVyMRpmz';}else{this.style.display='none';}">
           </div>
           <span class="login-satker-tag">SATKER 644690 &bull; POLRES TABANAN</span>
@@ -1234,7 +1342,7 @@
       <div class="sakti-brand">
         <button type="button" class="btn-mobile-drawer" onclick="toggleDrawer()" aria-label="Buka Menu">☰</button>
         <div class="sakti-logos">
-          <img src="Puskeu.png"" alt="Logo Keuangan Polri" referrerpolicy="no-referrer"
+          <img src="Puskeu.png" alt="Logo Keuangan Polri" referrerpolicy="no-referrer"
                onerror="if(!this.dataset.r){this.dataset.r=1;this.src='https://lh3.googleusercontent.com/d/1Z-3fhgw94F-Geg4rwQX4zd6KzVyMRpmz';}else{this.style.display='none';}">
         </div>
         <div class="sakti-appname">
@@ -1251,7 +1359,7 @@
       </div>
     </header>
 
-    <!-- MENU BAR MODUL (PERMINTAAN TUNKIN & SPPD HANYA TAMPIL UNTUK ADMIN / OPERATOR) -->
+    <!-- MENU BAR MODUL (PERMINTAAN TUNKIN, SPPD & PERHITUNGAN PAJAK TAMPIL UNTUK ADMIN / OPERATOR) -->
     <nav class="sakti-menubar">
       <button type="button" class="sakti-mod-btn active" id="tab-mon-terpadu" onclick="switchTopMenu('mon-terpadu')">
         📊 Monitoring Gaji &amp; Tunkin
@@ -1261,6 +1369,9 @@
       </button>
       <button type="button" class="sakti-mod-btn hidden" id="tab-sppd" onclick="switchTopMenu('sppd')">
         ✈️ Pembuatan SPPD <span class="sakti-lock-pill">ADMIN / OP</span>
+      </button>
+      <button type="button" class="sakti-mod-btn hidden" id="tab-pajak" onclick="switchTopMenu('pajak')">
+        🧾 Perhitungan Pajak <span class="sakti-lock-pill">ADMIN / OP</span>
       </button>
     </nav>
 
@@ -1295,6 +1406,8 @@
                 <h3>Monitoring Terpadu Gaji, Tunkin &amp; Seluruh Potongan Personel</h3>
                 <span class="muted" id="terpaduSearchInfo">Pilih periode lalu tampilkan atau cari nama / NRP / NIP.</span>
               </div>
+
+              <div id="terpaduFallbackBanner" class="notice hidden" style="margin-bottom:10px;background:#fffbeb;border-left-color:#f59e0b;color:#92400e;"></div>
 
               <div class="row">
                 <div class="field" style="max-width:210px;">
@@ -1950,6 +2063,196 @@
             </div>
           </section>
 
+          <!-- 4. MODUL PERHITUNGAN PAJAK (POLRES TABANAN & POLSEK JAJARAN) -->
+          <section id="lock-pajak" class="view-section hidden">
+            <div class="card lock-card">
+              <div style="font-size:38px;margin-bottom:10px;">🔒</div>
+              <h3 style="margin:0 0 8px;color:var(--sakti-navy);">Otorisasi Diperlukan: Modul Perhitungan Pajak</h3>
+              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>.</p>
+            </div>
+          </section>
+
+          <section id="pajak-bulanan" class="view-section hidden">
+            <!-- KARTU INPUT / PERHITUNGAN PAJAK -->
+            <div class="card">
+              <div class="card-head">
+                <div>
+                  <h3>🧾 Input &amp; Perhitungan Pajak Belanja (Polres Tabanan &amp; Polsek Jajaran)</h3>
+                  <div class="muted">Otomatis hitung DPP, PPN (11%), PPh Pasal 22 (1,5% Barang), PPh Pasal 23 (2% Jasa), serta input langsung PPh Pasal 21.</div>
+                </div>
+                <div class="actions" style="margin-bottom:0;">
+                  <button type="button" class="secondary" onclick="copyPajakBulanLalu()">📋 Salin Template Bulan Lalu</button>
+                  <button type="button" class="gold-btn" onclick="printLaporanPajak()">🖨️ Cetak Laporan Pajak (Print)</button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="field" style="max-width:190px;">
+                  <label for="pjPeriode">Periode Bulan (YYYY-MM) *</label>
+                  <input id="pjPeriode" type="month" list="availablePeriodsList" onchange="loadPajakBulanan()">
+                </div>
+                <div class="field" style="max-width:170px;">
+                  <label for="pjTanggal">Tanggal Transaksi</label>
+                  <input id="pjTanggal" type="date">
+                </div>
+                <div class="field" style="max-width:220px;">
+                  <label for="pjKelompok">Kelompok Unit *</label>
+                  <select id="pjKelompok" onchange="onPajakKelompokChange()">
+                    <option value="SATFUNG POLRES">SATFUNG / BAG / SIE POLRES</option>
+                    <option value="POLSEK JAJARAN">POLSEK JAJARAN (10 POLSEK)</option>
+                  </select>
+                </div>
+                <div class="field" style="max-width:250px;">
+                  <label for="pjSatkerUnit">Satfung / Polsek Jajaran *</label>
+                  <select id="pjSatkerUnit"></select>
+                </div>
+                <div class="field" style="max-width:190px;">
+                  <label for="pjMetodeBayar">Metode Pembayaran *</label>
+                  <select id="pjMetodeBayar">
+                    <option value="CASH">CASH (Tunai / UP)</option>
+                    <option value="CMS TRANSFER">CMS TRANSFER (Non-Tunai)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="field" style="min-width:260px;">
+                  <label for="pjUraian">Uraian Belanja / Kegiatan / Rekanan *</label>
+                  <input id="pjUraian" type="text" placeholder="Contoh: Belanja ATK / Pemeliharaan Ranmor / Honorarium...">
+                </div>
+                <div class="field" style="max-width:220px;">
+                  <label for="pjJenisBelanja">Objek PPh 22 / PPh 23 *</label>
+                  <select id="pjJenisBelanja" onchange="recalcPajakForm()">
+                    <option value="BARANG">Belanja Barang (PPh 22 = 1,5%)</option>
+                    <option value="JASA">Belanja Jasa / Sewa (PPh 23 = 2%)</option>
+                    <option value="NON_OBJEK">Honor / Bebas PPh 22 &amp; 23 (0%)</option>
+                  </select>
+                </div>
+                <div class="field" style="max-width:210px;">
+                  <label for="pjKenaPpn">Status PPN (11%) *</label>
+                  <select id="pjKenaPpn" onchange="recalcPajakForm()">
+                    <option value="YA">Kena PPN 11% (DPP = 100/111)</option>
+                    <option value="TIDAK">Bebas / Non-PPN (0%)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="pajak-calc-box">
+                <div class="row" style="margin-bottom:0;">
+                  <div class="field" style="max-width:230px;">
+                    <label for="pjJmlUang">Jumlah Uang / Nilai Bruto (Rp) *</label>
+                    <input id="pjJmlUang" type="number" min="0" placeholder="0" oninput="recalcPajakForm()">
+                  </div>
+                  <div class="field" style="max-width:210px;">
+                    <label for="pjPph21">PPh Pasal 21 (Input Nominal Rp)</label>
+                    <input id="pjPph21" type="number" min="0" value="0" placeholder="Masukkan nominal PPh 21..." oninput="recalcPajakForm()">
+                  </div>
+                  <div class="field">
+                    <label for="pjKeterangan">Keterangan / No. Kuitansi / NPWP</label>
+                    <input id="pjKeterangan" type="text" placeholder="Opsional (nomor bukti / catatan)...">
+                  </div>
+                </div>
+
+                <div class="pajak-live-strip">
+                  <div class="pajak-live-cell">
+                    <span>DPP (Dasar Pengenaan)</span>
+                    <b id="prevPjDpp">Rp 0</b>
+                  </div>
+                  <div class="pajak-live-cell">
+                    <span>PPN (11%)</span>
+                    <b id="prevPjPpn">Rp 0</b>
+                  </div>
+                  <div class="pajak-live-cell">
+                    <span>PPh Pasal 22 (1,5%)</span>
+                    <b id="prevPjPph22">Rp 0</b>
+                  </div>
+                  <div class="pajak-live-cell">
+                    <span>PPh Pasal 23 (2%)</span>
+                    <b id="prevPjPph23">Rp 0</b>
+                  </div>
+                  <div class="pajak-live-cell">
+                    <span>PPh Pasal 21 (Input)</span>
+                    <b id="prevPjPph21">Rp 0</b>
+                  </div>
+                  <div class="pajak-live-cell total">
+                    <span>Jumlah Pajak Dipungut</span>
+                    <b id="prevPjTotal">Rp 0</b>
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions" style="margin-bottom:0;">
+                <input type="hidden" id="pjEditId" value="">
+                <button type="button" class="primary" id="btnSavePajak" onclick="savePajakRow()">💾 Simpan Data Pajak</button>
+                <button type="button" class="secondary" onclick="resetPajakForm()">Bersihkan Form</button>
+              </div>
+            </div>
+
+            <!-- KARTU RINGKASAN & TABEL REKAP PAJAK BULANAN SIAP PRINT -->
+            <div class="card panel">
+              <div class="card-head">
+                <div>
+                  <h3 id="pajakTableHeading">Tabel Rekapitulasi Perhitungan Pajak Bulanan</h3>
+                  <div class="muted" id="pajakTableSub">Polres Tabanan &amp; Polsek Jajaran — Metode Pembayaran Cash &amp; CMS Transfer</div>
+                </div>
+                <div class="row" style="margin-bottom:0;gap:8px;align-items:center;">
+                  <select id="pjFilterKelompok" onchange="renderPajakTable()" style="width:auto;min-width:170px;">
+                    <option value="">Semua Unit (Polres + Polsek)</option>
+                    <option value="SATFUNG POLRES">Satfung Polres Tabanan</option>
+                    <option value="POLSEK JAJARAN">Polsek Jajaran</option>
+                  </select>
+                  <select id="pjFilterMetode" onchange="renderPajakTable()" style="width:auto;min-width:165px;">
+                    <option value="">Semua Metode Bayar</option>
+                    <option value="CASH">CASH (Tunai)</option>
+                    <option value="CMS TRANSFER">CMS TRANSFER</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid-4" style="margin-bottom:12px;">
+                <div class="card" style="padding:11px 13px;">
+                  <div class="label">Total Nilai Belanja (Bruto)</div>
+                  <div class="metric" id="kpiPjBruto" style="font-size:17px;">Rp 0</div>
+                </div>
+                <div class="card" style="padding:11px 13px;">
+                  <div class="label">Total Pajak Metode CASH</div>
+                  <div class="metric" id="kpiPjCash" style="font-size:17px;color:#b45309;">Rp 0</div>
+                </div>
+                <div class="card" style="padding:11px 13px;">
+                  <div class="label">Total Pajak CMS TRANSFER</div>
+                  <div class="metric" id="kpiPjCms" style="font-size:17px;color:#1d4ed8;">Rp 0</div>
+                </div>
+                <div class="card" style="padding:11px 13px;">
+                  <div class="label">Jumlah Total Pajak</div>
+                  <div class="metric green" id="kpiPjGrand" style="font-size:17px;">Rp 0</div>
+                </div>
+              </div>
+
+              <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat rincian DPP, PPN, PPh 22, PPh 23, PPh 21 &amp; Jumlah Pajak</span></div>
+              <div class="tablewrap">
+                <table id="pajakRekapTable">
+                  <thead>
+                    <tr>
+                      <th style="width:42px;text-align:center;">NO</th>
+                      <th>SATFUNG / POLSEK</th>
+                      <th>URAIAN</th>
+                      <th>METODE BAYAR</th>
+                      <th style="text-align:right;">JML UANG</th>
+                      <th style="text-align:right;">DPP</th>
+                      <th style="text-align:right;">PPN</th>
+                      <th style="text-align:right;">PPH 22</th>
+                      <th style="text-align:right;">PPH 23</th>
+                      <th style="text-align:right;">PPH 21</th>
+                      <th style="text-align:right;">JUMLAH PAJAK</th>
+                      <th>AKSI</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pajakRekapRows"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
         </div>
       </div>
     </div>
@@ -2011,6 +2314,14 @@ function safeUrl(u) {
   return '#';
 }
 
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 let authToken = sessionStorage.getItem('aristana_token') || '';
 let appPermissions = { canView: false, canWrite: false, canManageUsers: false, readOnly: true };
@@ -2023,6 +2334,28 @@ let currentPetikanPayload = null;
 let importSheetMeta = { polri: null, pns: null, defaultPeriod: '' };
 let parsedExcelImport = { POLRI: null, PNS: null };
 let parsedMonFileImport = null;
+let pajakItemsCache = [];
+let pajakPejabatCache = {};
+
+const UNIT_POLRES_LIST = [
+  'BAG OPS', 'BAG REN', 'BAG SDM', 'BAG LOG',
+  'SAT INTELKAM', 'SAT RESKRIM', 'SAT RESNARKOBA', 'SAT SAMAPTA',
+  'SAT LANTAS', 'SAT BINMAS', 'SAT POLAIRUD', 'SAT TAHTI',
+  'SIWAS', 'SIPROPAM', 'SIHUMAS', 'SIKUM', 'SITIK', 'SIUM', 'SIKEU', 'SIDOKKES', 'SPKT'
+];
+
+const UNIT_POLSEK_LIST = [
+  'POLSEK TABANAN',
+  'POLSEK KEDIRI',
+  'POLSEK MARGA',
+  'POLSEK PENEBEL',
+  'POLSEK BATURITI',
+  'POLSEK KERAMBITAN',
+  'POLSEK SELEMADEG',
+  'POLSEK SELEMADEG TIMUR',
+  'POLSEK SELEMADEG BARAT',
+  'POLSEK PUPUAN'
+];
 
 const POLRI_RANKS_CLIENT = {
   'BRIPDA': { gol: 'II/A', grade: 5 },
@@ -2084,6 +2417,14 @@ const SUB_GROUPS = {
       group: 'Referensi Anggota SiKeu & Pejabat',
       items: [
         { id: 'sppd-pejabat', label: '🎖️ Master Anggota SiKeu & Pangkat', title: 'Tambah / Update Pangkat Anggota SiKeu & Pejabat', crumb: 'Pembuatan SPPD / Referensi / Master Anggota SiKeu' }
+      ]
+    }
+  ],
+  'pajak': [
+    {
+      group: 'Perhitungan Pajak Bulanan',
+      items: [
+        { id: 'pajak-bulanan', label: '🧾 Input & Rekap Pajak Bulanan', title: 'Perhitungan Pajak Polres Tabanan & Polsek Jajaran (Cash & CMS Transfer)', crumb: 'Perhitungan Pajak / Rekapitulasi Bulanan' }
       ]
     }
   ]
@@ -2231,6 +2572,7 @@ function normalizeTerpaduItem(raw) {
 
   item.totalPotGabungan = item.potonganGaji + item.pajakTunkin + item.kurangAbsen + item.totalPotTunkin;
   item.totalTerimaGabungan = item.gajiBersih + item.sisaTunkin;
+  item.sumberMeta = String(item.sumberMeta || '').trim();
 
   item.rincianPotGaji = {
     bri: parseMoneyVal(pgRaw.bri, false),
@@ -2318,12 +2660,17 @@ function switchTopMenu(topKey) {
     $('sideHeading').innerHTML = '<span>OTORISASI MODUL</span>';
     $('sideDynamicArea').innerHTML = '<div style="padding:8px;font-size:12px;color:#cbd5e1;">Akun personel (Viewer) dapat melihat seluruh data Monitoring Gaji &amp; Tunkin serta mengubah password akun.</div>';
     $('lock-' + topKey).classList.remove('hidden');
-    $('pageTitle').textContent = topKey === 'req-tunkin' ? 'Modul Permintaan Tunkin' : 'Modul Pembuatan SPPD';
+    $('pageTitle').textContent = topKey === 'req-tunkin' ? 'Modul Permintaan Tunkin' : (topKey === 'sppd' ? 'Modul Pembuatan SPPD' : 'Modul Perhitungan Pajak');
     $('subTitle').textContent = 'Beranda / Khusus Admin & Operator';
     return;
   }
 
-  $('sideHeading').innerHTML = '<span>' + (topKey === 'req-tunkin' ? 'MODUL PERMINTAAN TUNKIN' : 'MODUL PEMBUATAN SPPD') + '</span>';
+  const sideLabels = {
+    'req-tunkin': 'MODUL PERMINTAAN TUNKIN',
+    'sppd': 'MODUL PEMBUATAN SPPD',
+    'pajak': 'MODUL PERHITUNGAN PAJAK'
+  };
+  $('sideHeading').innerHTML = '<span>' + (sideLabels[topKey] || 'MENU MODUL') + '</span>';
   const groups = SUB_GROUPS[topKey] || [];
   let html = '';
   let firstItem = null;
@@ -2369,6 +2716,9 @@ function showSubSection(sectionId) {
   if (sectionId === 'kelola-akun') loadAuthAccounts();
   if (sectionId === 'sppd-form' || sectionId === 'sppd-pejabat' || sectionId === 'sppd-riwayat') {
     loadSppdWorkspace();
+  }
+  if (sectionId === 'pajak-bulanan') {
+    initPajakSection();
   }
 }
 
@@ -2416,6 +2766,7 @@ function logoutSession() {
   currentUserInfo = null;
   if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.add('hidden');
   if ($('tab-sppd')) $('tab-sppd').classList.add('hidden');
+  if ($('tab-pajak')) $('tab-pajak').classList.add('hidden');
   if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.add('hidden');
   if ($('petikanGajiPanel')) $('petikanGajiPanel').classList.add('hidden');
   if ($('importMonitoringPanel')) $('importMonitoringPanel').classList.add('hidden');
@@ -2495,6 +2846,20 @@ function updateAvailablePeriodsDatalist(periods) {
   dl.innerHTML = periods.map(p => `<option value="${esc(p)}"></option>`).join('');
 }
 
+let idleTimer = null;
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  if (!authToken) return;
+  idleTimer = setTimeout(() => {
+    logoutSession();
+    $('loginMsg').textContent = 'Sesi berakhir otomatis karena tidak ada aktivitas selama 30 menit.';
+    $('loginMsg').classList.remove('hidden');
+  }, 30 * 60 * 1000);
+}
+['click', 'keydown', 'mousemove', 'touchstart'].forEach(ev => {
+  document.addEventListener(ev, resetIdleTimer, { passive: true });
+});
+
 function init(refreshTab = false) {
   if (!authToken) {
     showLoginPageOnly();
@@ -2523,6 +2888,7 @@ function init(refreshTab = false) {
       $('userInfo').textContent = d.user.name + ' (' + d.user.role + ')';
       if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.remove('hidden');
       if ($('tab-sppd')) $('tab-sppd').classList.remove('hidden');
+      if ($('tab-pajak')) $('tab-pajak').classList.remove('hidden');
       if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.remove('hidden');
     } else {
       badge.className = 'sakti-status-chip viewer';
@@ -2530,6 +2896,7 @@ function init(refreshTab = false) {
       $('userInfo').textContent = d.user.name + ' • Akses Monitoring Gaji & Tunkin';
       if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.add('hidden');
       if ($('tab-sppd')) $('tab-sppd').classList.add('hidden');
+      if ($('tab-pajak')) $('tab-pajak').classList.add('hidden');
       if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.add('hidden');
       if ($('petikanGajiPanel')) $('petikanGajiPanel').classList.add('hidden');
       if ($('importMonitoringPanel')) $('importMonitoringPanel').classList.add('hidden');
@@ -2552,6 +2919,7 @@ function init(refreshTab = false) {
       if ($('pgPeriode') && !$('pgPeriode').value) $('pgPeriode').value = d.period;
       if ($('periodImportPolri') && !$('periodImportPolri').value) $('periodImportPolri').value = d.period;
       if ($('periodImportPns') && !$('periodImportPns').value) $('periodImportPns').value = d.period;
+      if ($('pjPeriode') && !$('pjPeriode').value) $('pjPeriode').value = d.period;
     }
     if ($('pgTglCetak') && !$('pgTglCetak').value) {
       $('pgTglCetak').value = new Date().toISOString().slice(0, 10);
@@ -3512,8 +3880,22 @@ function loadTerpadu() {
   const period = $('viewPeriod').value;
   call('getMonitoringTerpadu', [period], rows => {
     terpaduCache = (rows || []).map(normalizeTerpaduItem);
+    updateFallbackBanner(terpaduCache, period);
     filterTerpaduRows();
   });
+}
+
+function updateFallbackBanner(list, activePeriod) {
+  const banner = $('terpaduFallbackBanner');
+  if (!banner) return;
+  const fbItem = (list || []).find(x => x.sumberMeta && x.sumberMeta.indexOf('ESTIMASI POT. TUNKIN') === 0);
+  if (fbItem) {
+    const srcPer = fbItem.sumberMeta.replace('ESTIMASI POT. TUNKIN', '').trim();
+    banner.innerHTML = `ℹ️ <strong>Info Potongan Tunkin (${esc(activePeriod)}):</strong> Data tunkin/potongan terbaru untuk bulan <strong>${esc(activePeriod)}</strong> belum diinput, sehingga rincian potongan tunkin otomatis menampilkan data potongan tunkin bulan sebelumnya (<strong>${esc(srcPer || 'Bulan Terakhir')}</strong>).`;
+    banner.classList.remove('hidden');
+  } else {
+    banner.classList.add('hidden');
+  }
 }
 
 function resetTerpaduSearch() {
@@ -3576,10 +3958,13 @@ function filterTerpaduRows() {
     return;
   }
 
-  tbody.innerHTML = filtered.map((item, idx) => `
+  tbody.innerHTML = filtered.map((item, idx) => {
+    const isFb = item.sumberMeta && item.sumberMeta.indexOf('ESTIMASI POT. TUNKIN') === 0;
+    const fbTag = isFb ? `<span class="fallback-pill" title="${esc(item.sumberMeta)}">Pot. Bln Lalu</span>` : '';
+    return `
     <tr onclick="renderKartuRincianTerpadu(${idx}, window._lastFilteredTerpadu)" style="cursor:pointer;">
       <td>${esc(item.nrp)}</td>
-      <td><strong>${esc(item.nama)}</strong></td>
+      <td><strong>${esc(item.nama)}</strong>${fbTag}</td>
       <td>${esc(item.pangkat)}</td>
       <td>${esc(item.jenis)}</td>
       <td>${esc(item.grade)}</td>
@@ -3598,7 +3983,7 @@ function filterTerpaduRows() {
       <td class="num-col net-col">${formatMoney(item.sisaTunkin)}</td>
       <td class="num-col net-col"><strong>${formatMoney(item.totalTerimaGabungan)}</strong></td>
     </tr>
-  `).join('');
+  `;}).join('');
 
   window._lastFilteredTerpadu = filtered;
 
@@ -3617,6 +4002,8 @@ function renderKartuRincianTerpadu(index, listSource) {
   const pg = item.rincianPotGaji || {};
   const rekBriLabel = item.rekBri ? esc(item.rekBri) : '<span class="muted">-</span>';
   const rekBniLabel = item.rekBni ? esc(item.rekBni) : '<span class="muted">-</span>';
+  const isFb = item.sumberMeta && item.sumberMeta.indexOf('ESTIMASI POT. TUNKIN') === 0;
+  const fbBadge = isFb ? `<span class="fallback-pill">${esc(item.sumberMeta)}</span>` : '';
 
   const petikanBtnHtml = appPermissions.canWrite
     ? `<button type="button" class="gold-btn" data-person="${esc(item.nrp || item.nama)}" onclick="togglePetikanGajiPanel(true, this.dataset.person)">📄 Buat Petikan Gaji</button>`
@@ -3626,7 +4013,7 @@ function renderKartuRincianTerpadu(index, listSource) {
     <div class="terpadu-kartu">
       <div class="terpadu-head">
         <div>
-          <div class="terpadu-nama">${esc(item.nama)} <span class="muted">(${esc(item.pangkat)} • NRP/NIP ${esc(item.nrp)})</span></div>
+          <div class="terpadu-nama">${esc(item.nama)} <span class="muted">(${esc(item.pangkat)} • NRP/NIP ${esc(item.nrp)})</span> ${fbBadge}</div>
           <div class="terpadu-sub">
             Jenis: <strong>${esc(item.jenis || '-')}</strong> &bull; Grade: <strong>${esc(item.grade || '-')}</strong> &bull;
             Rek BRI: <strong>${rekBriLabel}</strong> &bull; Rekening BNI: <strong>${rekBniLabel}</strong>
@@ -3976,6 +4363,7 @@ function loadSppdWorkspace() {
   call('getSppdWorkspaceData', [], data => {
     if (!data) return;
     sppdPeopleCache = data.personel || [];
+    pajakPejabatCache = data.pejabat || {};
 
     const opts = ['<option value="">-- Pilih Anggota SiKeu --</option>'].concat(
       sppdPeopleCache.map((p, idx) =>
@@ -4218,42 +4606,479 @@ function generateSppdDoc() {
     pejabat: collectPejabatPayload()
   };
 
-  msg('Sedang membuat Sprin (Google Docs) dan SPD & Nominatif (Google Sheets)...', 'notice');
-  call('buatSprinDanSppd', [payload], res => {
+  msg('Sedang membuat Sprin (Google Docs) dan SPD + Nominatif (Google Sheets)...', 'notice');
+  call('buatSprinDanSppd', [payload], r => {
     const e = $('message');
     e.className = 'notice success';
     e.classList.remove('hidden');
-    e.innerHTML = esc(res.message) + '<br>'
-      + '• <a href="' + safeUrl(res.sprinUrl) + '" target="_blank" rel="noopener"><strong>Buka Sprin (Google Docs)</strong></a> &nbsp;|&nbsp; '
-      + '• <a href="' + safeUrl(res.spdUrl) + '" target="_blank" rel="noopener"><strong>Buka SPD &amp; Nominatif (Google Sheets)</strong></a>';
+    e.innerHTML =
+      'Dokumen berhasil dibuat: ' +
+      '<a href="' + safeUrl(r.sprinUrl) + '" target="_blank" rel="noopener"><strong>Buka Sprin (Google Docs)</strong></a> | ' +
+      '<a href="' + safeUrl(r.spdUrl) + '" target="_blank" rel="noopener"><strong>Buka SPD &amp; Nominatif (Google Sheets)</strong></a>';
     $('sppdNoSprin').value = '';
     $('sppdNoSpd').value = '';
     loadSppdWorkspace();
   });
 }
 
-function esc(s) {
-  return String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+/* ===================== MODUL PERHITUNGAN PAJAK (POLRES TABANAN & POLSEK JAJARAN) ===================== */
+
+function initPajakSection() {
+  if (!$('pjPeriode').value) {
+    $('pjPeriode').value = $('viewPeriod').value || $('periodDash').value || new Date().toISOString().slice(0, 7);
+  }
+  if (!$('pjTanggal').value) {
+    $('pjTanggal').value = new Date().toISOString().slice(0, 10);
+  }
+  onPajakKelompokChange();
+  recalcPajakForm();
+  if (!Object.keys(pajakPejabatCache || {}).length) {
+    call('getSppdWorkspaceData', [], d => {
+      if (d && d.pejabat) pajakPejabatCache = d.pejabat;
+    });
+  }
+  loadPajakBulanan();
 }
 
-// Auto-logout jika tidak ada aktivitas selama 30 menit
-let idleTimer = null;
-function resetIdleTimer() {
-  if (!authToken) return;
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(() => {
-    logoutSession();
-    $('loginMsg').textContent = 'Sesi berakhir otomatis karena tidak ada aktivitas selama 30 menit. Silakan login kembali.';
-    $('loginMsg').classList.remove('hidden');
-  }, 30 * 60 * 1000);
+function onPajakKelompokChange(selectedUnit) {
+  const kel = $('pjKelompok').value;
+  const list = kel === 'POLSEK JAJARAN' ? UNIT_POLSEK_LIST : UNIT_POLRES_LIST;
+  $('pjSatkerUnit').innerHTML = list.map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('');
+  if (selectedUnit) {
+    $('pjSatkerUnit').value = selectedUnit;
+  }
 }
-['click', 'keydown', 'mousemove', 'touchstart'].forEach(evt => {
-  document.addEventListener(evt, resetIdleTimer, { passive: true });
+
+function computePajakPreviewValues() {
+  const jmlUang = Math.max(0, Math.round(parseFloat($('pjJmlUang').value) || 0));
+  const kenaPpn = $('pjKenaPpn').value === 'YA';
+  const jenisBelanja = $('pjJenisBelanja').value;
+
+  const dpp = kenaPpn ? Math.round((jmlUang * 100) / 111) : jmlUang;
+  const ppn = kenaPpn ? Math.round(dpp * 0.11) : 0;
+  const pph22 = jenisBelanja === 'BARANG' ? Math.round(dpp * 0.015) : 0;
+  const pph23 = jenisBelanja === 'JASA' ? Math.round(dpp * 0.02) : 0;
+  const pph21 = Math.max(0, Math.round(parseFloat($('pjPph21').value) || 0));
+  const jumlahPajak = ppn + pph22 + pph23 + pph21;
+
+  return { jmlUang, dpp, ppn, pph22, pph23, pph21, jumlahPajak, kenaPpn, jenisBelanja };
+}
+
+function recalcPajakForm() {
+  const c = computePajakPreviewValues();
+  $('prevPjDpp').textContent = 'Rp ' + formatMoney(c.dpp);
+  $('prevPjPpn').textContent = 'Rp ' + formatMoney(c.ppn);
+  $('prevPjPph22').textContent = 'Rp ' + formatMoney(c.pph22);
+  $('prevPjPph23').textContent = 'Rp ' + formatMoney(c.pph23);
+  $('prevPjPph21').textContent = 'Rp ' + formatMoney(c.pph21);
+  $('prevPjTotal').textContent = 'Rp ' + formatMoney(c.jumlahPajak);
+}
+
+function loadPajakBulanan() {
+  if (!appPermissions.canWrite) return;
+  const period = $('pjPeriode').value;
+  if (!period) return;
+  call('getPajakBulanan', [period], res => {
+    pajakItemsCache = (res && Array.isArray(res.items)) ? res.items : [];
+    renderPajakTable();
+  });
+}
+
+function savePajakRow() {
+  const period = $('pjPeriode').value;
+  const uraian = $('pjUraian').value.trim();
+  if (!period) return msg('Periode bulan pajak wajib diisi.', 'error');
+  if (!uraian) return msg('Uraian belanja / kegiatan pajak wajib diisi.', 'error');
+
+  const btn = $('btnSavePajak');
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  call('savePajakTransaksi', [{
+    id: $('pjEditId').value,
+    periode: period,
+    tanggal: $('pjTanggal').value,
+    kelompok: $('pjKelompok').value,
+    satkerUnit: $('pjSatkerUnit').value,
+    metodeBayar: $('pjMetodeBayar').value,
+    uraian: uraian,
+    jenisBelanja: $('pjJenisBelanja').value,
+    kenaPpn: $('pjKenaPpn').value === 'YA',
+    jmlUang: $('pjJmlUang').value,
+    pph21: $('pjPph21').value,
+    keterangan: $('pjKeterangan').value
+  }], res => {
+    btn.disabled = false;
+    btn.textContent = '💾 Simpan Data Pajak';
+    msg(res.message || 'Data pajak berhasil disimpan.', 'success');
+    resetPajakForm();
+    loadPajakBulanan();
+  }, () => {
+    btn.disabled = false;
+    btn.textContent = '💾 Simpan Data Pajak';
+  });
+}
+
+function resetPajakForm() {
+  $('pjEditId').value = '';
+  $('pjUraian').value = '';
+  $('pjJmlUang').value = '';
+  $('pjPph21').value = '0';
+  $('pjKeterangan').value = '';
+  $('btnSavePajak').textContent = '💾 Simpan Data Pajak';
+  recalcPajakForm();
+}
+
+function editPajakRow(id) {
+  const item = pajakItemsCache.find(x => x.id === id);
+  if (!item) return;
+  $('pjEditId').value = item.id;
+  $('pjPeriode').value = item.periode;
+  if (item.tanggal) $('pjTanggal').value = item.tanggal;
+  $('pjKelompok').value = item.kelompok || 'SATFUNG POLRES';
+  onPajakKelompokChange(item.satkerUnit);
+  $('pjMetodeBayar').value = item.metodeBayar || 'CASH';
+  $('pjUraian').value = item.uraian || '';
+  $('pjJenisBelanja').value = item.jenisBelanja || 'BARANG';
+  $('pjKenaPpn').value = item.kenaPpn ? 'YA' : 'TIDAK';
+  $('pjJmlUang').value = item.jmlUang || 0;
+  $('pjPph21').value = item.pph21 || 0;
+  $('pjKeterangan').value = item.keterangan || '';
+  $('btnSavePajak').textContent = '💾 Simpan Perubahan Pajak';
+  recalcPajakForm();
+  $('pjUraian').focus();
+}
+
+function deletePajakRow(id) {
+  if (!confirm('Hapus baris perhitungan pajak ini?')) return;
+  call('deletePajakTransaksi', [id], res => {
+    msg(res.message || 'Baris pajak dihapus.', 'success');
+    loadPajakBulanan();
+  });
+}
+
+function copyPajakBulanLalu() {
+  const period = $('pjPeriode').value;
+  if (!period) return msg('Pilih periode bulan tujuan terlebih dahulu.', 'error');
+  if (!confirm(`Salin daftar transaksi pajak dari bulan terakhir sebelum ${period} ke periode ${period}?`)) return;
+  call('copyPajakTemplateBulanLalu', [period], res => {
+    msg(res.message, 'success');
+    loadPajakBulanan();
+  });
+}
+
+function getFilteredPajakRows() {
+  const fKel = ($('pjFilterKelompok') ? $('pjFilterKelompok').value : '').trim().toUpperCase();
+  const fMet = ($('pjFilterMetode') ? $('pjFilterMetode').value : '').trim().toUpperCase();
+  return pajakItemsCache.filter(it => {
+    if (fKel && String(it.kelompok || '').toUpperCase() !== fKel) return false;
+    if (fMet && String(it.metodeBayar || '').toUpperCase() !== fMet) return false;
+    return true;
+  });
+}
+
+function formatBulanTahunIndo(ym) {
+  const months = ['JANUARI', 'FEBRUARI', 'MARET', 'APRIL', 'MEI', 'JUNI', 'JULI', 'AGUSTUS', 'SEPTEMBER', 'OKTOBER', 'NOVEMBER', 'DESEMBER'];
+  const m = String(ym || '').match(/^(\d{4})-(\d{2})$/);
+  if (!m) return ym || '';
+  return (months[parseInt(m[2], 10) - 1] || m[2]) + ' ' + m[1];
+}
+
+function renderPajakTable() {
+  const period = $('pjPeriode').value || '';
+  const bulanLabel = formatBulanTahunIndo(period);
+  $('pajakTableHeading').textContent = `Tabel Perhitungan Pajak Bulan ${bulanLabel}`;
+
+  const rows = getFilteredPajakRows();
+
+  let totBruto = 0;
+  let totCashPajak = 0;
+  let totCmsPajak = 0;
+  let totGrandPajak = 0;
+
+  rows.forEach(it => {
+    const jmlUang = parseMoneyVal(it.jmlUang);
+    const jmlPajak = parseMoneyVal(it.jumlahPajak);
+    totBruto += jmlUang;
+    totGrandPajak += jmlPajak;
+    if (String(it.metodeBayar || '').toUpperCase() === 'CMS TRANSFER') {
+      totCmsPajak += jmlPajak;
+    } else {
+      totCashPajak += jmlPajak;
+    }
+  });
+
+  $('kpiPjBruto').textContent = 'Rp ' + formatMoney(totBruto);
+  $('kpiPjCash').textContent = 'Rp ' + formatMoney(totCashPajak);
+  $('kpiPjCms').textContent = 'Rp ' + formatMoney(totCmsPajak);
+  $('kpiPjGrand').textContent = 'Rp ' + formatMoney(totGrandPajak);
+
+  const tbody = $('pajakRekapRows');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="12" class="muted">Belum ada data perhitungan pajak untuk periode dan filter yang dipilih.</td></tr>';
+    return;
+  }
+
+  const groups = [
+    { key: 'SATFUNG POLRES', title: 'I. SATFUNG / BAG / SIE POLRES TABANAN' },
+    { key: 'POLSEK JAJARAN', title: 'II. POLSEK JAJARAN POLRES TABANAN' }
+  ];
+
+  let html = '';
+  let grand = { uang: 0, dpp: 0, ppn: 0, p22: 0, p23: 0, p21: 0, total: 0 };
+
+  groups.forEach(grp => {
+    const gRows = rows.filter(r => String(r.kelompok || 'SATFUNG POLRES').toUpperCase() === grp.key);
+    if (!gRows.length) return;
+
+    html += `<tr class="pajak-group-row"><td colspan="12">${esc(grp.title)}</td></tr>`;
+    let sub = { uang: 0, dpp: 0, ppn: 0, p22: 0, p23: 0, p21: 0, total: 0 };
+
+    gRows.forEach((it, idx) => {
+      const u = parseMoneyVal(it.jmlUang);
+      const d = parseMoneyVal(it.dpp);
+      const ppn = parseMoneyVal(it.ppn);
+      const p22 = parseMoneyVal(it.pph22);
+      const p23 = parseMoneyVal(it.pph23);
+      const p21 = parseMoneyVal(it.pph21);
+      const tot = parseMoneyVal(it.jumlahPajak);
+
+      sub.uang += u; sub.dpp += d; sub.ppn += ppn; sub.p22 += p22; sub.p23 += p23; sub.p21 += p21; sub.total += tot;
+      grand.uang += u; grand.dpp += d; grand.ppn += ppn; grand.p22 += p22; grand.p23 += p23; grand.p21 += p21; grand.total += tot;
+
+      const isCms = String(it.metodeBayar || '').toUpperCase() === 'CMS TRANSFER';
+      const badgeMet = isCms
+        ? '<span class="badge-metode cms">CMS TRANSFER</span>'
+        : '<span class="badge-metode cash">CASH</span>';
+
+      html += `
+        <tr>
+          <td style="text-align:center;">${idx + 1}</td>
+          <td><strong>${esc(it.satkerUnit)}</strong></td>
+          <td style="white-space:normal;min-width:190px;">${esc(it.uraian)}${it.keterangan ? '<div class="muted" style="font-size:11px;">' + esc(it.keterangan) + '</div>' : ''}</td>
+          <td>${badgeMet}</td>
+          <td class="num-col">${formatMoney(u)}</td>
+          <td class="num-col">${formatMoney(d)}</td>
+          <td class="num-col">${formatMoney(ppn)}</td>
+          <td class="num-col">${formatMoney(p22)}</td>
+          <td class="num-col">${formatMoney(p23)}</td>
+          <td class="num-col">${formatMoney(p21)}</td>
+          <td class="num-col net-col"><strong>${formatMoney(tot)}</strong></td>
+          <td>
+            <button type="button" class="secondary" style="padding:4px 8px;font-size:11px;" data-id="${esc(it.id)}" onclick="editPajakRow(this.dataset.id)">Edit</button>
+            <button type="button" class="danger-btn" data-id="${esc(it.id)}" onclick="deletePajakRow(this.dataset.id)">Hapus</button>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+      <tr class="pajak-subtotal-row">
+        <td colspan="4" style="text-align:right;">JUMLAH ${esc(grp.key)}</td>
+        <td class="num-col">${formatMoney(sub.uang)}</td>
+        <td class="num-col">${formatMoney(sub.dpp)}</td>
+        <td class="num-col">${formatMoney(sub.ppn)}</td>
+        <td class="num-col">${formatMoney(sub.p22)}</td>
+        <td class="num-col">${formatMoney(sub.p23)}</td>
+        <td class="num-col">${formatMoney(sub.p21)}</td>
+        <td class="num-col">${formatMoney(sub.total)}</td>
+        <td></td>
+      </tr>
+    `;
+  });
+
+  html += `
+    <tr class="pajak-grandtotal-row">
+      <td colspan="4" style="text-align:right;">JUMLAH TOTAL KESELURUHAN (POLRES &amp; POLSEK JAJARAN)</td>
+      <td class="num-col">${formatMoney(grand.uang)}</td>
+      <td class="num-col">${formatMoney(grand.dpp)}</td>
+      <td class="num-col">${formatMoney(grand.ppn)}</td>
+      <td class="num-col">${formatMoney(grand.p22)}</td>
+      <td class="num-col">${formatMoney(grand.p23)}</td>
+      <td class="num-col">${formatMoney(grand.p21)}</td>
+      <td class="num-col">${formatMoney(grand.total)}</td>
+      <td></td>
+    </tr>
+  `;
+
+  tbody.innerHTML = html;
+}
+
+function printLaporanPajak() {
+  const rows = getFilteredPajakRows();
+  if (!rows.length) {
+    return msg('Tidak ada data pajak pada periode ini untuk dicetak.', 'error');
+  }
+  const period = $('pjPeriode').value || '';
+  const bulanUpper = formatBulanTahunIndo(period);
+  const fMet = ($('pjFilterMetode') ? $('pjFilterMetode').value : '').trim().toUpperCase();
+  const subMetode = fMet ? `METODE PEMBAYARAN: ${fMet}` : 'METODE PEMBAYARAN: CASH & CMS TRANSFER';
+
+  const groups = [
+    { key: 'SATFUNG POLRES', title: 'I. SATFUNG / BAG / SIE POLRES TABANAN' },
+    { key: 'POLSEK JAJARAN', title: 'II. POLSEK JAJARAN POLRES TABANAN' }
+  ];
+
+  let bodyRowsHtml = '';
+  let grand = { uang: 0, dpp: 0, ppn: 0, p22: 0, p23: 0, p21: 0, total: 0 };
+
+  groups.forEach(grp => {
+    const gRows = rows.filter(r => String(r.kelompok || 'SATFUNG POLRES').toUpperCase() === grp.key);
+    if (!gRows.length) return;
+
+    bodyRowsHtml += `<tr class="grp"><td colspan="11">${esc(grp.title)}</td></tr>`;
+    let sub = { uang: 0, dpp: 0, ppn: 0, p22: 0, p23: 0, p21: 0, total: 0 };
+
+    gRows.forEach((it, idx) => {
+      const u = parseMoneyVal(it.jmlUang);
+      const d = parseMoneyVal(it.dpp);
+      const ppn = parseMoneyVal(it.ppn);
+      const p22 = parseMoneyVal(it.pph22);
+      const p23 = parseMoneyVal(it.pph23);
+      const p21 = parseMoneyVal(it.pph21);
+      const tot = parseMoneyVal(it.jumlahPajak);
+
+      sub.uang += u; sub.dpp += d; sub.ppn += ppn; sub.p22 += p22; sub.p23 += p23; sub.p21 += p21; sub.total += tot;
+      grand.uang += u; grand.dpp += d; grand.ppn += ppn; grand.p22 += p22; grand.p23 += p23; grand.p21 += p21; grand.total += tot;
+
+      bodyRowsHtml += `
+        <tr>
+          <td style="text-align:center;">${idx + 1}</td>
+          <td>${esc(it.satkerUnit)}</td>
+          <td>${esc(it.uraian)}</td>
+          <td style="text-align:center;">${esc(it.metodeBayar)}</td>
+          <td class="num">${formatMoney(u)}</td>
+          <td class="num">${formatMoney(d)}</td>
+          <td class="num">${formatMoney(ppn)}</td>
+          <td class="num">${formatMoney(p22)}</td>
+          <td class="num">${formatMoney(p23)}</td>
+          <td class="num">${formatMoney(p21)}</td>
+          <td class="num"><strong>${formatMoney(tot)}</strong></td>
+        </tr>
+      `;
+    });
+
+    bodyRowsHtml += `
+      <tr class="sub">
+        <td colspan="4" style="text-align:right;">JUMLAH ${esc(grp.key)}</td>
+        <td class="num">${formatMoney(sub.uang)}</td>
+        <td class="num">${formatMoney(sub.dpp)}</td>
+        <td class="num">${formatMoney(sub.ppn)}</td>
+        <td class="num">${formatMoney(sub.p22)}</td>
+        <td class="num">${formatMoney(sub.p23)}</td>
+        <td class="num">${formatMoney(sub.p21)}</td>
+        <td class="num">${formatMoney(sub.total)}</td>
+      </tr>
+    `;
+  });
+
+  bodyRowsHtml += `
+    <tr class="grand">
+      <td colspan="4" style="text-align:right;">JUMLAH TOTAL KESELURUHAN</td>
+      <td class="num">${formatMoney(grand.uang)}</td>
+      <td class="num">${formatMoney(grand.dpp)}</td>
+      <td class="num">${formatMoney(grand.ppn)}</td>
+      <td class="num">${formatMoney(grand.p22)}</td>
+      <td class="num">${formatMoney(grand.p23)}</td>
+      <td class="num">${formatMoney(grand.p21)}</td>
+      <td class="num">${formatMoney(grand.total)}</td>
+    </tr>
+  `;
+
+  const ksk = (pajakPejabatCache && pajakPejabatCache.KASIKEU) || {
+    jabatanResmi: 'PS KASIKEU',
+    nama: 'I KOMANG TRI ARNADA, S.H.',
+    pangkat: 'AJUN INSPEKTUR POLISI SATU',
+    nrp: '83100522'
+  };
+
+  const printWin = window.open('', '_blank', 'width=1120,height=800');
+  if (!printWin) {
+    return msg('Pop-up cetak diblokir browser. Izinkan pop-up lalu klik Cetak kembali.', 'error');
+  }
+
+  printWin.document.write(`
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+      <meta charset="UTF-8">
+      <title>Perhitungan Pajak Bulan ${esc(bulanUpper)} - Polres Tabanan</title>
+      <style>
+        @page { size: A4 landscape; margin: 10mm; }
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; color: #000; margin: 0; }
+        .kop { display: inline-block; text-align: center; font-weight: bold; font-size: 9.5pt; border-bottom: 1.5px solid #000; padding-bottom: 3px; margin-bottom: 8px; line-height: 1.25; }
+        .judul { text-align: center; font-weight: bold; font-size: 11pt; margin-bottom: 10px; line-height: 1.35; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+        th, td { border: 1px solid #000; padding: 4px 5px; vertical-align: middle; }
+        th { background: #e5e7eb; font-weight: bold; text-align: center; font-size: 8.5pt; }
+        td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        tr.grp td { background: #f3f4f6; font-weight: bold; }
+        tr.sub td { background: #e5e7eb; font-weight: bold; }
+        tr.grand td { background: #d1d5db; font-weight: bold; font-size: 9.5pt; }
+        .ttd-wrap { display: flex; justify-content: flex-end; margin-top: 10px; }
+        .ttd-box { width: 270px; text-align: center; font-size: 9.5pt; line-height: 1.3; }
+      </style>
+    </head>
+    <body>
+      <div class="kop">
+        KEPOLISIAN NEGARA REPUBLIK INDONESIA<br>
+        DAERAH BALI<br>
+        RESOR TABANAN
+      </div>
+
+      <div class="judul">
+        REKAPITULASI PERHITUNGAN PAJAK BELANJA POLRES TABANAN &amp; POLSEK JAJARAN<br>
+        BULAN ${esc(bulanUpper)} (${esc(subMetode)})
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px;">NO</th>
+            <th style="width:145px;">SATFUNG / POLSEK</th>
+            <th>URAIAN</th>
+            <th style="width:95px;">METODE BAYAR</th>
+            <th style="width:92px;">JML UANG</th>
+            <th style="width:88px;">DPP</th>
+            <th style="width:82px;">PPN</th>
+            <th style="width:80px;">PPH 22</th>
+            <th style="width:80px;">PPH 23</th>
+            <th style="width:80px;">PPH 21</th>
+            <th style="width:96px;">JUMLAH PAJAK</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${bodyRowsHtml}
+        </tbody>
+      </table>
+
+      <div class="ttd-wrap">
+        <div class="ttd-box">
+          <div>Tabanan, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${esc(bulanUpper)}</div>
+          <div>${esc(ksk.jabatanResmi || 'PS KASIKEU')}</div>
+          <div style="height:56px;"></div>
+          <div style="font-weight:bold;text-decoration:underline;">${esc(ksk.nama || 'I KOMANG TRI ARNADA, S.H.')}</div>
+          <div>${esc((ksk.pangkat || 'AJUN INSPEKTUR POLISI SATU') + (ksk.nrp ? ' NRP ' + ksk.nrp : ''))}</div>
+        </div>
+      </div>
+
+      <script>
+        window.onload = function() {
+          setTimeout(function() { window.print(); }, 250);
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printWin.document.close();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  setupExcelDropzones();
+  setupMonFileDropzone();
+  init(false);
 });
-
-setupExcelDropzones();
-setupMonFileDropzone();
-init();
 </script>
 </body>
 </html>
