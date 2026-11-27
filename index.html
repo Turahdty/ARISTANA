@@ -1716,7 +1716,7 @@
             <div class="card lock-card">
               <div style="font-size:38px;margin-bottom:10px;">🔒</div>
               <h3 style="margin:0 0 8px;color:var(--sakti-navy);">Otorisasi Diperlukan: Modul Permintaan Tunkin</h3>
-              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. KASATKER dapat melihat seluruh data Monitoring Gaji &amp; Tunkin (read-only); Viewer hanya dapat melihat data miliknya sendiri.</p>
+              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. KASATKER hanya dapat melihat data personel bawahannya (Kapolres, Wakapolres &amp; Kasipropam melihat seluruh personel), tanpa hak ubah; PERSONIL hanya melihat data gaji &amp; potongan miliknya sendiri.</p>
             </div>
           </section>
 
@@ -2042,7 +2042,7 @@
                 <div class="field"><label for="accUser">Username / NRP / NIP *</label><input id="accUser"></div>
                 <div class="field"><label for="accPass">Password *</label><input id="accPass"></div>
                 <div class="field"><label for="accNama">Nama User / Personel *</label><input id="accNama"></div>
-                <div class="field"><label for="accRole">Role *</label><select id="accRole"><option value="VIEWER">VIEWER (Personel)</option><option value="KASATKER">KASATKER (Pimpinan)</option><option value="OPERATOR">OPERATOR</option><option value="ADMIN">ADMIN</option></select></div>
+                <div class="field"><label for="accRole">Role *</label><select id="accRole"><option value="PERSONIL">PERSONIL (data sendiri)</option><option value="KASATKER">KASATKER (bawahan / seluruh personel, hanya lihat)</option><option value="OPERATOR">OPERATOR (akses penuh)</option><option value="ADMIN">ADMIN (akses penuh)</option></select></div>
                 <div class="field"><label for="accAktif">Status</label><select id="accAktif"><option value="YA">AKTIF</option><option value="TIDAK">NONAKTIF</option></select></div>
               </div>
               <div class="actions">
@@ -2064,7 +2064,7 @@
             <div class="card lock-card">
               <div style="font-size:38px;margin-bottom:10px;">🔒</div>
               <h3 style="margin:0 0 8px;color:var(--sakti-navy);">Otorisasi Diperlukan: Modul Pembuatan SPPD</h3>
-              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. KASATKER dapat melihat seluruh data Monitoring Gaji &amp; Tunkin (read-only); Viewer hanya dapat melihat data miliknya sendiri.</p>
+              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. KASATKER hanya dapat melihat data personel bawahannya (Kapolres, Wakapolres &amp; Kasipropam melihat seluruh personel), tanpa hak ubah; PERSONIL hanya melihat data gaji &amp; potongan miliknya sendiri.</p>
             </div>
           </section>
 
@@ -2427,9 +2427,18 @@
       </div>
       <div class="surat-modal-body">
         <div id="suratPreviewErr" class="notice error hidden"></div>
+        <div id="suratErrActions" class="actions hidden" style="margin-bottom:10px;">
+          <button type="button" class="primary" onclick="generateSuratPreview()">↻ Coba Lagi</button>
+          <button type="button" class="secondary" onclick="cekTemplateSurat()">🔍 Cek Template &amp; Izin</button>
+        </div>
+        <div id="suratDiagBox" class="notice hidden" style="font-size:12px;"></div>
         <div id="suratBusy" class="surat-busy hidden">Menyusun draf surat dari template...</div>
         <div id="suratPreviewContent" class="surat-prev-grid hidden">
-          <iframe id="suratPreviewFrame" class="surat-prev-frame" title="Pratinjau surat"></iframe>
+          <div>
+            <iframe id="suratPreviewFrame" class="surat-prev-frame" title="Pratinjau surat"></iframe>
+            <div id="suratNoPdf" class="notice hidden" style="margin:8px 0 0;">Pratinjau PDF tidak tersedia. Gunakan tautan <strong>Buka Draf di Docs</strong> untuk memeriksa isi surat, lalu klik <strong>Simpan Surat</strong> bila sudah benar.</div>
+            <div style="margin-top:6px;"><a id="suratPdfTab" href="#" target="_blank" rel="noopener" class="hidden" style="font-size:12px;">↗ Buka PDF di tab baru (bila pratinjau kosong di HP / Safari)</a></div>
+          </div>
           <div class="surat-prev-side">
             <div>
               <label for="suratNomorUrut">Nomor Urut Surat</label>
@@ -2669,7 +2678,10 @@ async function runGasApi(fn, fullArgs) {
   try {
     parsed = JSON.parse(rawText);
   } catch (e) {
-    throw new Error('Respons server tidak valid. Pastikan Web App GAS sudah di-deploy ulang dengan doPost(e) & akses Anyone.');
+    const petunjuk = /authoriz|otorisasi|permission|izin|consent/i.test(rawText)
+      ? ' Server meminta otorisasi izin baru: jalankan fungsi otorisasiAwal di editor Apps Script, lalu Deploy > Manage deployments > Versi baru.'
+      : '';
+    throw new Error('Respons server tidak valid. Pastikan Web App GAS sudah di-deploy ulang (versi baru) dengan doPost(e) & akses Anyone.' + petunjuk);
   }
   if (!parsed || parsed.ok === false) {
     const errMsg = (parsed && parsed.error) || 'Permintaan ke backend Google Apps Script gagal.';
@@ -2850,14 +2862,16 @@ function switchTopMenu(topKey) {
     renderLeftSidebarForTerpadu();
     $('terpadu').classList.remove('hidden');
     $('pageTitle').textContent = 'Monitoring Terpadu Gaji, Tunkin & Potongan';
-    $('subTitle').textContent = 'Beranda / Monitoring Gaji & Tunkin / Seluruh Personel';
+    $('subTitle').textContent = 'Beranda / Monitoring Gaji & Tunkin / ' + (
+      !currentUserInfo || currentUserInfo.scopeMode === 'ALL' ? 'Seluruh Personel'
+        : (currentUserInfo.scopeMode === 'UNIT' ? 'Personel Bawahan' : 'Data Pribadi'));
     loadTerpadu();
     return;
   }
 
   if (!appPermissions.canWrite) {
     $('sideHeading').innerHTML = '<span>OTORISASI MODUL</span>';
-    $('sideDynamicArea').innerHTML = '<div style="padding:8px;font-size:12px;color:#cbd5e1;">KASATKER dapat melihat seluruh data Monitoring Gaji &amp; Tunkin tanpa hak edit. Viewer hanya dapat melihat data miliknya sendiri.</div>';
+    $('sideDynamicArea').innerHTML = '<div style="padding:8px;font-size:12px;color:#cbd5e1;">KASATKER hanya dapat melihat personel bawahannya (Kapolres, Wakapolres &amp; Kasipropam: seluruh personel) tanpa hak edit. PERSONIL hanya dapat melihat data miliknya sendiri.</div>';
     $('lock-' + topKey).classList.remove('hidden');
     $('pageTitle').textContent = topKey === 'req-tunkin' ? 'Modul Permintaan Tunkin' : (topKey === 'sppd' ? 'Modul Pembuatan SPPD' : 'Modul Perhitungan Pajak');
     $('subTitle').textContent = 'Beranda / Khusus Admin & Operator';
@@ -3093,12 +3107,16 @@ function init(refreshTab = false) {
       if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.remove('hidden');
     } else {
       badge.className = 'sakti-status-chip viewer';
-      badge.textContent = d.user.role === 'KASATKER'
-        ? 'KASATKER: ' + d.user.name
-        : 'PERSONEL: ' + d.user.name + (d.user.nrp ? ' (' + d.user.nrp + ')' : '');
-      $('userInfo').textContent = d.user.name + (d.user.role === 'KASATKER'
-        ? ' • Monitoring Seluruh Personel (Read Only)'
-        : ' • Monitoring Gaji & Tunkin Pribadi');
+      if (d.user.role === 'KASATKER') {
+        const semua = d.user.scopeMode === 'ALL';
+        badge.textContent = 'KASATKER' + (semua ? ' (SELURUH PERSONEL)' : ' (BAWAHAN)') + ': ' + d.user.name;
+        $('userInfo').textContent = d.user.name + (semua
+          ? ' • Monitoring Seluruh Personel (Hanya Lihat)'
+          : ' • Monitoring Personel Bawahan — ' + (d.user.scopeCount || 0) + ' personel (Hanya Lihat)');
+      } else {
+        badge.textContent = 'PERSONIL: ' + d.user.name + (d.user.nrp ? ' (' + d.user.nrp + ')' : '');
+        $('userInfo').textContent = d.user.name + ' • Monitoring Gaji & Tunkin Pribadi';
+      }
       if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.add('hidden');
       if ($('tab-sppd')) $('tab-sppd').classList.add('hidden');
       if ($('tab-pajak')) $('tab-pajak').classList.add('hidden');
@@ -4194,7 +4212,7 @@ function filterTerpaduRows() {
 
   // VIEWER/PERSONEL hanya menerima data miliknya sendiri dari server.
   // Karena hasilnya maksimal satu personel, tampilkan rincian lengkap otomatis.
-  const isViewerPersonel = currentUserInfo && currentUserInfo.role === 'VIEWER';
+  const isViewerPersonel = currentUserInfo && currentUserInfo.role === 'PERSONIL';
   if ((isViewerPersonel && filtered.length === 1) || (kw && filtered.length <= 5)) {
     renderKartuRincianTerpadu(0, filtered);
   } else {
@@ -4217,7 +4235,7 @@ function renderKartuRincianTerpadu(index, listSource) {
     ? `<button type="button" class="gold-btn" data-person="${esc(item.nrp || item.nama)}" onclick="togglePetikanGajiPanel(true, this.dataset.person)">📄 Buat Petikan Gaji</button>`
     : '';
 
-  const viewerNote = currentUserInfo && currentUserInfo.role === 'VIEWER'
+  const viewerNote = currentUserInfo && currentUserInfo.role === 'PERSONIL'
     ? `<div class="viewer-detail-note">ℹ️ Rincian penghasilan dan seluruh potongan personel ditampilkan otomatis berdasarkan akun yang sedang login.</div>`
     : '';
 
@@ -4311,7 +4329,7 @@ function arsipkanGajiBulanIni() {
   });
 }
 
-let suratState = { draftId: '', nomorSurat: '', nomorUrut: '', totalBayar: 0, blobUrl: '', draftUrl: '' };
+let suratState = { draftId: '', nomorSurat: '', nomorUrut: '', totalBayar: 0, blobUrl: '', draftUrl: '', loading: false };
 
 function suratBase64ToBlobUrl(b64) {
   const bin = atob(b64);
@@ -4325,29 +4343,57 @@ function suratRevokeBlob() {
   suratState.blobUrl = '';
 }
 
+let suratTimer = null;
+
+function suratStopTimer() {
+  if (suratTimer) { clearInterval(suratTimer); suratTimer = null; }
+}
+
 function setSuratBusy(busy, text) {
-  $('suratBusy').textContent = text || 'Menyusun draf surat dari template...';
+  suratStopTimer();
+  const base = text || 'Menyusun draf surat dari template...';
+  $('suratBusy').textContent = base;
   $('suratBusy').classList.toggle('hidden', !busy);
-  if (busy) $('suratPreviewContent').classList.add('hidden');
+  if (busy) {
+    $('suratPreviewContent').classList.add('hidden');
+    $('suratPreviewErr').classList.add('hidden');
+    $('suratErrActions').classList.add('hidden');
+    $('suratDiagBox').classList.add('hidden');
+    const t0 = Date.now();
+    suratTimer = setInterval(() => {
+      $('suratBusy').textContent = base + ' (' + Math.round((Date.now() - t0) / 1000) + ' detik)';
+    }, 1000);
+  }
   $('btnSuratApprove').disabled = true;
   $('btnSuratPrint').disabled = true;
+}
+
+function suratTampilkanError(err) {
+  setSuratBusy(false);
+  $('suratPreviewContent').classList.add('hidden');
+  $('suratPreviewErr').textContent = err && err.message ? err.message : String(err);
+  $('suratPreviewErr').classList.remove('hidden');
+  $('suratErrActions').classList.remove('hidden');
 }
 
 function buatSuratTunkin() {
   const period = $('periodDash').value;
   if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
-  suratState = { draftId: '', nomorSurat: '', nomorUrut: '', totalBayar: 0, blobUrl: '', draftUrl: '' };
+  suratState = { draftId: '', nomorSurat: '', nomorUrut: '', totalBayar: 0, blobUrl: '', draftUrl: '', loading: false };
   $('suratNomorUrut').value = '';
   $('suratPreviewErr').classList.add('hidden');
+  $('suratErrActions').classList.add('hidden');
+  $('suratDiagBox').classList.add('hidden');
   $('suratDraftLink').classList.add('hidden');
-  $('suratPreviewModal').classList.remove('hidden');
+  $('suratPreviewModal').classList.remove('hidden');   // popup langsung tampil
   generateSuratPreview();
 }
 
 function generateSuratPreview() {
   const period = $('periodDash').value;
-  if (!period) return;
-  $('suratPreviewErr').classList.add('hidden');
+  if (!period) return suratTampilkanError(new Error('Pilih periode terlebih dahulu.'));
+  if (suratState.loading) return;
+  suratState.loading = true;
   setSuratBusy(true, 'Menyusun draf surat dari template...');
 
   runGasApi('previewSuratPencairanTunkin', [{
@@ -4356,6 +4402,7 @@ function generateSuratPreview() {
       draftId: suratState.draftId
     }, authToken])
     .then(r => {
+      suratState.loading = false;
       setSuratBusy(false);
       if (!r || !r.ok) throw new Error('Gagal menyusun pratinjau surat.');
       suratState.draftId = r.draftId;
@@ -4385,12 +4432,27 @@ function generateSuratPreview() {
       }
 
       suratRevokeBlob();
+      const tabLink = $('suratPdfTab');
       if (r.pdfBase64) {
-        suratState.blobUrl = suratBase64ToBlobUrl(r.pdfBase64);
-        $('suratPreviewFrame').src = suratState.blobUrl;
-        $('btnSuratPrint').disabled = false;
+        try {
+          suratState.blobUrl = suratBase64ToBlobUrl(r.pdfBase64);
+          $('suratPreviewFrame').classList.remove('hidden');
+          $('suratPreviewFrame').src = suratState.blobUrl;
+          $('suratNoPdf').classList.add('hidden');
+          tabLink.href = suratState.blobUrl;
+          tabLink.classList.remove('hidden');
+          $('btnSuratPrint').disabled = false;
+        } catch (e) {
+          suratState.blobUrl = '';
+          $('suratPreviewFrame').classList.add('hidden');
+          $('suratNoPdf').classList.remove('hidden');
+          tabLink.classList.add('hidden');
+        }
       } else {
         $('suratPreviewFrame').removeAttribute('src');
+        $('suratPreviewFrame').classList.add('hidden');
+        $('suratNoPdf').classList.remove('hidden');
+        tabLink.classList.add('hidden');
       }
 
       const dl = $('suratDraftLink');
@@ -4401,11 +4463,34 @@ function generateSuratPreview() {
       $('btnSuratApprove').disabled = false;
     })
     .catch(err => {
-      setSuratBusy(false);
-      $('suratPreviewErr').textContent = err && err.message ? err.message : String(err);
-      $('suratPreviewErr').classList.remove('hidden');
+      suratState.loading = false;
+      suratTampilkanError(err);
     });
 }
+
+function cekTemplateSurat() {
+  const box = $('suratDiagBox');
+  box.className = 'notice';
+  box.textContent = 'Memeriksa template surat & izin Google Drive/Docs...';
+  runGasApi('cekTemplateSuratTunkin', [authToken])
+    .then(r => {
+      const li = (arr, cls) => (arr || []).map(t => `<li${cls ? ' class="' + cls + '"' : ''}>${esc(t)}</li>`).join('');
+      box.className = 'notice ' + (r.ok && !(r.masalah || []).length ? 'success' : 'error');
+      box.innerHTML = '<strong>Hasil pemeriksaan:</strong><ul style="margin:4px 0 0 16px;padding:0;">' +
+        li(r.langkah) + li(r.masalah) + '</ul>' +
+        (r.nomorUrutBerikut ? '<div style="margin-top:4px;">Nomor urut surat berikutnya: <strong>' + esc(r.nomorUrutBerikut) + '</strong></div>' : '');
+    })
+    .catch(err => {
+      box.className = 'notice error';
+      box.textContent = 'Pemeriksaan gagal: ' + (err && err.message ? err.message : String(err));
+    });
+}
+
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && $('suratPreviewModal') && !$('suratPreviewModal').classList.contains('hidden')) {
+    batalSuratTunkin();
+  }
+});
 
 function cetakPreviewSurat() {
   if (!suratState.blobUrl) return;
@@ -4449,6 +4534,8 @@ function setujuiSuratTunkin() {
 
 function batalSuratTunkin() {
   const id = suratState.draftId;
+  suratStopTimer();
+  suratState.loading = false;
   suratRevokeBlob();
   suratState.draftId = '';
   $('suratPreviewModal').classList.add('hidden');
@@ -4973,7 +5060,10 @@ function filterAuthAccountsTable() {
       <td>${esc(a.nama)}</td>
       <td>${esc(a.role)}</td>
       <td>${a.aktif ? 'AKTIF' : 'NONAKTIF'}</td>
-      <td><button type="button" class="secondary" data-user="${esc(a.username)}" onclick="fillAuthAccountForm(this.dataset.user)">Edit / Reset</button></td>
+      <td>
+        <button type="button" class="secondary" data-user="${esc(a.username)}" onclick="fillAuthAccountForm(this.dataset.user)">Edit / Reset</button>
+        ${a.role === 'KASATKER' ? `<button type="button" class="secondary" data-user="${esc(a.username)}" onclick="lihatCakupanKasatker(this.dataset.user)">👥 Cakupan</button>` : ''}
+      </td>
     </tr>`
   ).join('') || '<tr><td colspan="6" class="muted">Tidak ada akun yang cocok.</td></tr>';
 }
@@ -4985,8 +5075,36 @@ function fillAuthAccountForm(username) {
   $('accPass').value = '';
   $('accPass').placeholder = 'Isi password baru (kosongkan jika tidak diubah)';
   $('accNama').value = found.nama;
-  $('accRole').value = found.role || 'VIEWER';
+  $('accRole').value = found.role || 'PERSONIL';
   $('accAktif').value = found.aktif ? 'YA' : 'TIDAK';
+}
+
+function lihatCakupanKasatker(username) {
+  msg('Memeriksa cakupan bawahan ' + username + '...', 'notice');
+  call('getScopeKasatker', [username], r => {
+    hideMsg();
+    let box = $('cakupanKasatkerModal');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'cakupanKasatkerModal';
+      box.className = 'modal-backdrop';
+      document.body.appendChild(box);
+    }
+    const rows = (r.members || []).map((m, i) => `<tr>
+        <td>${i + 1}</td><td>${esc(m.nrp)}</td><td>${esc(m.nama)}</td><td>${esc(m.pangkat)}</td>
+        <td>${esc(m.jabatan)}</td><td>${esc(m.via)}</td></tr>`).join('');
+    const isi = r.mode === 'ALL'
+      ? '<div class="notice success">Pejabat ini (Kapolres / Wakapolres / Kasipropam) dapat melihat <strong>seluruh personel</strong> (' + esc(r.jumlah) + ' orang), tanpa hak ubah.</div>'
+      : `<div class="muted" style="margin-bottom:8px;">Cakupan: <strong>${esc(r.label)}</strong> — ${esc(r.jumlah)} personel.
+          KDANAK pada sheet POLRI: <strong>${esc(r.kdanakSheetPolri || (r.kdanakTersedia ? 'tidak ditemukan' : 'kolom KDANAK tidak ada'))}</strong></div>
+         <div class="tablewrap" style="max-height:52vh;overflow:auto;"><table>
+           <thead><tr><th>No</th><th>NRP</th><th>Nama</th><th>Pangkat</th><th>Jabatan</th><th>Dasar</th></tr></thead>
+           <tbody>${rows || '<tr><td colspan="6" class="muted">Belum ada bawahan terdeteksi.</td></tr>'}</tbody></table></div>`;
+    box.innerHTML = `<div class="modal-box" style="max-width:980px;">
+        <div class="modal-head"><strong>👥 Cakupan Data: ${esc(r.nama || r.username)}</strong>
+          <button type="button" onclick="document.getElementById('cakupanKasatkerModal').remove()" style="background:none;border:0;color:#fff;font-size:18px;cursor:pointer;" aria-label="Tutup">✕</button></div>
+        <div class="modal-body"><div class="muted" style="margin-bottom:6px;">Jabatan: ${esc(r.jabatan || '-')}</div>${isi}</div></div>`;
+  });
 }
 
 function syncPersonnelAccounts() {
