@@ -2042,7 +2042,7 @@
                 <div class="field"><label for="accUser">Username / NRP / NIP *</label><input id="accUser"></div>
                 <div class="field"><label for="accPass">Password *</label><input id="accPass"></div>
                 <div class="field"><label for="accNama">Nama User / Personel *</label><input id="accNama"></div>
-                <div class="field"><label for="accRole">Role *</label><select id="accRole"><option value="PERSONIL">PERSONIL (data sendiri)</option><option value="KASATKER">KASATKER (bawahan / seluruh personel, hanya lihat)</option><option value="OPERATOR">OPERATOR (akses penuh)</option><option value="ADMIN">ADMIN (akses penuh)</option></select></div>
+                <div class="field"><label for="accRole">Role *</label><select id="accRole"><option value="PERSONIL">PERSONIL (data sendiri)</option><option value="KASATKER">KASATKER (bawahan / seluruh personel, hanya lihat)</option><option value="OPERATOR">OPERATOR (semua menu kecuali Riwayat Perubahan &amp; Kelola Akun)</option><option value="ADMIN">ADMIN (akses penuh termasuk audit &amp; administrasi)</option></select></div>
                 <div class="field"><label for="accAktif">Status</label><select id="accAktif"><option value="YA">AKTIF</option><option value="TIDAK">NONAKTIF</option></select></div>
               </div>
               <div class="actions">
@@ -2602,7 +2602,7 @@ const SUB_GROUPS = {
     {
       group: 'Audit & Administrasi',
       items: [
-        { id: 'riwayat', label: '◷ Riwayat Perubahan', title: 'Log Audit Perubahan Data', crumb: 'Permintaan Tunkin / Audit / Riwayat Perubahan' },
+        { id: 'riwayat', label: '◷ Riwayat Perubahan', title: 'Log Audit Perubahan Data', crumb: 'Permintaan Tunkin / Audit / Riwayat Perubahan', adminOnly: true },
         { id: 'kelola-akun', label: '🔑 Kelola Akun Login & User', title: 'Manajemen Akun Login Personel, Operator & Admin', crumb: 'Permintaan Tunkin / Administrasi / Akun Login', adminOnly: true }
       ]
     }
@@ -2905,6 +2905,12 @@ function switchTopMenu(topKey) {
 
 function showSubSection(sectionId) {
   hideMsg();
+  // Audit & Administrasi (Riwayat Perubahan, Kelola Akun) khusus ADMIN; OPERATOR tidak dapat membukanya.
+  const metaGuard = Object.values(SUB_GROUPS).flat().flatMap(g => g.items).find(x => x.id === sectionId);
+  if (metaGuard && metaGuard.adminOnly && !appPermissions.canManageUsers) {
+    msg('Menu ini khusus role ADMIN.', 'error');
+    return;
+  }
   document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
   const target = $(sectionId);
   if (target) target.classList.remove('hidden');
