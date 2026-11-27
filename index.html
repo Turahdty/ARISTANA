@@ -1299,6 +1299,53 @@
       .terpadu-ringkas-box { width: 100%; text-align: left; }
       .actions button { flex: 1 1 calc(50% - 6px); }
     }
+
+    /* ===================== MONITORING GRADE & PERUBAHAN DATA ===================== */
+    .mg-status-bar { display: grid; grid-template-columns: 180px 1fr; border: 1px solid var(--sakti-border); border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+    .mg-status-bar > div { padding: 10px 14px; font-weight: 800; }
+    .mg-status-bar .lbl { background: #f1f5f9; color: var(--sakti-navy); text-align: center; }
+    .mg-status-bar .val { text-align: center; }
+    .mg-status-bar .val.ok { background: #c6efce; color: #006100; }
+    .mg-status-bar .val.bad { background: #ffc7ce; color: #9c0006; }
+    .mg-status-bar .val.warn { background: #ffeb9c; color: #7a5b00; }
+    .mg-source { font-size: 12px; color: #475569; line-height: 1.6; margin-bottom: 10px; }
+    .mg-source b { color: var(--sakti-navy); }
+    .mg-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 10px; }
+    .mg-chip { border: 1px solid var(--sakti-border); background: #fff; color: var(--sakti-navy); border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .mg-chip.active { background: var(--sakti-navy); color: #fff; border-color: var(--sakti-navy); }
+    .mg-chip .n { display: inline-block; min-width: 18px; margin-left: 4px; padding: 0 5px; border-radius: 9px; background: rgba(148,163,184,.25); }
+    .mg-sec-title { background: #dbe7f3; color: var(--sakti-navy); font-weight: 800; padding: 7px 10px; border-radius: 4px 4px 0 0; margin-top: 14px; }
+    table.mg-rekap th { text-align: center; white-space: normal; line-height: 1.25; font-size: 11px; }
+    table.mg-rekap td { text-align: right; }
+    table.mg-rekap td.c { text-align: center; font-weight: 800; }
+    table.mg-rekap td.idx { background: #fff7e0; color: #1d4ed8; font-weight: 700; }
+    table.mg-rekap td.web { background: #fff7e0; padding: 3px 4px; }
+    table.mg-rekap td.web input { width: 70px; text-align: right; padding: 4px 6px; font-weight: 700; color: #1d4ed8; }
+    table.mg-rekap tr.tot td { background: #e2e8f0; font-weight: 800; }
+    table.mg-rekap td.up { color: #15803d; font-weight: 800; }
+    table.mg-rekap td.down { color: #b91c1c; font-weight: 800; }
+    .mg-st { display: inline-block; min-width: 92px; text-align: center; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 800; }
+    .mg-st.ok { background: #c6efce; color: #006100; }
+    .mg-st.bad { background: #ffc7ce; color: #9c0006; }
+    .mg-st.warn { background: #ffeb9c; color: #7a5b00; }
+    .mg-kat { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 800; }
+    .mg-kat.k-masuk { background: #dcfce7; color: #166534; }
+    .mg-kat.k-keluar { background: #fee2e2; color: #991b1b; }
+    .mg-kat.k-naik { background: #dbeafe; color: #1e40af; }
+    .mg-kat.k-turun { background: #ffedd5; color: #9a3412; }
+    .mg-kat.k-data { background: #f3e8ff; color: #6b21a8; }
+    .mg-kat.k-tetap { background: #f1f5f9; color: #475569; }
+    .mg-grade-chg { font-weight: 800; }
+    .mg-grade-chg .old { color: #94a3b8; text-decoration: line-through; margin-right: 4px; }
+    .mg-check-list { margin: 6px 0 0 18px; padding: 0; font-size: 12px; }
+    @media (max-width: 760px) { .mg-status-bar { grid-template-columns: 1fr; } }
+    @media print {
+      body.mg-printing * { visibility: hidden; }
+      body.mg-printing #monitor-grade, body.mg-printing #monitor-grade * { visibility: visible; }
+      body.mg-printing #monitor-grade { position: absolute; left: 0; top: 0; width: 100%; }
+      body.mg-printing #monitor-grade .no-print { display: none !important; }
+      body.mg-printing #monitor-grade .tablewrap { overflow: visible !important; max-height: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -1870,6 +1917,92 @@
             </div>
           </section>
 
+          <!-- SUB-MENU: MONITORING GRADE & PERUBAHAN DATA BULANAN (TANPA SNAPSHOT) -->
+          <section id="monitor-grade" class="view-section hidden">
+            <div class="card no-print">
+              <div class="card-head">
+                <h3>Monitoring Grade &amp; Perubahan Data Personel</h3>
+                <button type="button" class="primary" onclick="loadMonitoringGrade()">🔍 Tampilkan / Muat Ulang</button>
+              </div>
+              <div class="row">
+                <div class="field" style="max-width:200px;"><label for="mgPeriod">Bulan Target (data yang diinput)</label><input id="mgPeriod" type="month" list="availablePeriodsList" onchange="mgAutoBase()"></div>
+                <div class="field" style="max-width:200px;"><label for="mgBasePeriod">Dibandingkan dengan Bulan</label><input id="mgBasePeriod" type="month" list="availablePeriodsList"></div>
+                <div class="field" style="max-width:260px;"><label for="mgTargetSource">Sumber Data Bulan Target</label>
+                  <select id="mgTargetSource">
+                    <option value="LIVE">DATABASE live (input terbaru)</option>
+                    <option value="SNAPSHOT">Snapshot APP_TUNKIN bulan target</option>
+                  </select>
+                </div>
+                <div class="field" style="max-width:280px;"><label for="mgBaseSource">Sumber Data Bulan Pembanding</label>
+                  <select id="mgBaseSource" onchange="mgToggleSince()">
+                    <option value="AUTO">Otomatis (snapshot jika ada, jika tidak dari Riwayat)</option>
+                    <option value="RIWAYAT">Selalu rekonstruksi dari Riwayat Perubahan</option>
+                  </select>
+                </div>
+                <div class="field" style="max-width:220px;"><label for="mgSince">Kondisi pembanding per tanggal</label><input id="mgSince" type="date"></div>
+              </div>
+              <div class="muted">Tanpa snapshot bulan sebelumnya, sistem membangun ulang data bulan pembanding dari DATABASE saat ini dengan membatalkan semua catatan <strong>Riwayat Perubahan</strong> sejak tanggal di atas. Isi tanggal dengan hari pertama Anda mulai menginput perubahan untuk bulan target. Perubahan yang diketik langsung di sheet DATABASE (bukan lewat aplikasi) tidak tercatat di riwayat.</div>
+            </div>
+
+            <div id="mgEmpty" class="card muted">Pilih bulan lalu klik <strong>Tampilkan</strong> untuk melihat rekap grade dan daftar perubahan personel.</div>
+
+            <div id="mgResult" class="hidden">
+              <div class="card">
+                <div class="mg-status-bar">
+                  <div class="lbl">STATUS</div>
+                  <div class="val" id="mgStatusVal">—</div>
+                </div>
+                <div class="mg-source" id="mgSourceInfo"></div>
+                <div class="grid-4">
+                  <div class="card"><div class="label">Personel Bulan Target</div><div class="metric" id="mgTotTarget">0</div></div>
+                  <div class="card"><div class="label">Personel Bulan Pembanding</div><div class="metric" id="mgTotBase">0</div></div>
+                  <div class="card"><div class="label">Jumlah Perubahan</div><div class="metric" id="mgTotChange">0</div></div>
+                  <div class="card"><div class="label">Selisih Tunkin Bruto</div><div class="metric" id="mgTotSelisih" style="font-size:18px;">Rp 0</div></div>
+                </div>
+                <div class="actions no-print" style="margin-top:10px;">
+                  <button type="button" class="success-btn" id="mgSaveWebBtn" onclick="saveMonitoringGradeWeb()">💾 Simpan Jumlah Web (PDF)</button>
+                  <button type="button" class="secondary" onclick="mgDownloadCsv()">⬇️ Unduh Daftar Perubahan (CSV)</button>
+                  <button type="button" class="secondary" onclick="mgPrint()">🖨️ Cetak</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="mg-sec-title">1. POLRI (Polri Umum + Tipikor)</div>
+                <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat seluruh kolom</span></div>
+                <div class="tablewrap"><table class="mg-rekap" id="mgTablePolri"></table></div>
+
+                <div class="mg-sec-title">2. PNS (PNS + PPPK)</div>
+                <div class="tablewrap"><table class="mg-rekap" id="mgTablePns"></table></div>
+
+                <div class="mg-sec-title">3. Rincian Total dan Pemeriksaan Data</div>
+                <div class="tablewrap"><table class="mg-rekap" id="mgTableCheck"></table></div>
+                <div id="mgCheckDetail"></div>
+              </div>
+
+              <div class="card">
+                <div class="card-head">
+                  <h3>4. Perubahan Grade &amp; Data Personel per Orang</h3>
+                  <input id="mgSearch" class="no-print" placeholder="Cari nama / NRP / NIP..." oninput="renderMgChanges()" style="max-width:260px;">
+                </div>
+                <div class="mg-chips no-print" id="mgChips"></div>
+                <div class="table-scroll-hint"><span>👉 Geser tabel ke kanan untuk melihat detail perubahan</span></div>
+                <div class="tablewrap">
+                  <table id="mgChangeTable">
+                    <thead><tr><th>No</th><th>Kategori</th><th>NRP/NIP</th><th>Nama</th><th>Jenis</th><th>Pangkat</th><th>Grade</th><th>Tunkin Lama</th><th>Tunkin Baru</th><th>Selisih</th><th>Keterangan</th></tr></thead>
+                    <tbody id="mgChangeRows"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card hidden" id="mgRiwayatCard">
+                <div class="card-head"><h3>Catatan Riwayat yang Dibatalkan untuk Membangun Data Pembanding</h3></div>
+                <div class="tablewrap">
+                  <table><thead><tr><th>Waktu</th><th>NRP/NIP</th><th>Nama</th><th>Tindakan</th></tr></thead><tbody id="mgRiwayatRows"></tbody></table>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section id="riwayat" class="view-section hidden">
             <div class="card">
               <div class="card-head">
@@ -2396,7 +2529,8 @@ const SUB_GROUPS = {
       items: [
         { id: 'dashboard', label: '▦ Dashboard, Snapshot & Pencairan', title: 'Dashboard, Snapshot, Sinkron, Backup & Pencairan Tunkin', crumb: 'Permintaan Tunkin / Proses Bulanan / Snapshot & Pencairan' },
         { id: 'import-excel', label: '📥 Import Excel POLRI & PNS', title: 'Import Data Gaji Excel Multi-Periode (POLRI & PNS Terpisah)', crumb: 'Permintaan Tunkin / Proses Bulanan / Import Excel POLRI & PNS' },
-        { id: 'potongan', label: '− Input Potongan & Tetap', title: 'Input Potongan & Pengurangan Tunkin', crumb: 'Permintaan Tunkin / Proses Bulanan / Potongan' }
+        { id: 'potongan', label: '− Input Potongan & Tetap', title: 'Input Potongan & Pengurangan Tunkin', crumb: 'Permintaan Tunkin / Proses Bulanan / Potongan' },
+        { id: 'monitor-grade', label: '📈 Monitoring Grade & Perubahan', title: 'Monitoring Grade & Perubahan Data Personel Bulanan', crumb: 'Permintaan Tunkin / Proses Bulanan / Monitoring Grade' }
       ]
     },
     {
@@ -2729,6 +2863,7 @@ function showSubSection(sectionId) {
     $('stTanggal').value = new Date().toISOString().slice(0, 10);
   }
   if (sectionId === 'riwayat') loadHistory();
+  if (sectionId === 'monitor-grade') initMonitoringGrade();
   if (sectionId === 'kelola-akun') loadAuthAccounts();
   if (sectionId === 'sppd-form' || sectionId === 'sppd-pejabat' || sectionId === 'sppd-riwayat') {
     loadSppdWorkspace();
@@ -4315,6 +4450,319 @@ function savePotonganTetap() {
     $('dNominal').value = '';
     $('dKet').value = '';
   });
+}
+
+/* ===================== MONITORING GRADE & PERUBAHAN DATA ===================== */
+let mgCache = null;
+let mgFilter = 'BERUBAH';
+
+function mgShiftMonth(ym, delta) {
+  const m = String(ym || '').match(/^(\d{4})-(\d{2})$/);
+  if (!m) return '';
+  const d = new Date(Number(m[1]), Number(m[2]) - 1 + delta, 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function mgAutoBase() {
+  const p = $('mgPeriod').value;
+  if (!p) return;
+  const base = mgShiftMonth(p, -1);
+  $('mgBasePeriod').value = base;
+  $('mgSince').value = base + '-01';
+}
+
+function mgToggleSince() { /* tanggal dipakai bila pembanding direkonstruksi dari riwayat */ }
+
+function initMonitoringGrade() {
+  if (!$('mgPeriod').value) {
+    const fallback = ($('periodDash') && $('periodDash').value) || '';
+    const now = new Date();
+    const next = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    $('mgPeriod').value = fallback ? mgShiftMonth(fallback, 1) : mgShiftMonth(next, 1);
+    mgAutoBase();
+  }
+}
+
+function mgNum(v) { return (v === null || v === undefined || v === '') ? '' : Number(v).toLocaleString('id-ID'); }
+function mgSigned(v) {
+  const n = Number(v || 0);
+  if (!n) return '0';
+  return (n > 0 ? '+' : '−') + Math.abs(n).toLocaleString('id-ID');
+}
+function mgStClass(s) { return s === 'SESUAI' || s === 'BALANCE' ? 'ok' : (s === 'TIDAK SESUAI' || s === 'TIDAK BALANCE' ? 'bad' : 'warn'); }
+
+function loadMonitoringGrade() {
+  const period = $('mgPeriod').value;
+  if (!period) return msg('Pilih bulan target terlebih dahulu.', 'error');
+  const params = {
+    period: period,
+    basePeriod: $('mgBasePeriod').value || '',
+    targetSource: $('mgTargetSource').value,
+    baseSource: $('mgBaseSource').value,
+    sinceDate: $('mgSince').value || ''
+  };
+  msg('Menyusun monitoring grade ' + period + '...', 'notice');
+  call('getMonitoringGrade', [params], r => {
+    hideMsg();
+    mgCache = r;
+    renderMonitoringGrade();
+  });
+}
+
+function renderMonitoringGrade() {
+  const r = mgCache;
+  if (!r) return;
+  $('mgEmpty').classList.add('hidden');
+  $('mgResult').classList.remove('hidden');
+
+  const statusText = r.statusAll === 'BALANCE'
+    ? 'BALANCE - jumlah personel dan tunkin sesuai dengan web'
+    : (r.statusAll === 'TIDAK BALANCE' ? 'TIDAK BALANCE - ada selisih jumlah personel / tunkin dengan web' : 'PERLU DICEK - lengkapi jumlah Web (PDF) / periksa data');
+  $('mgStatusVal').textContent = statusText;
+  $('mgStatusVal').className = 'val ' + mgStClass(r.statusAll);
+
+  $('mgSourceInfo').innerHTML =
+    `Bulan target <b>${esc(r.period)}</b>: ${esc(r.targetLabel)}<br>` +
+    `Bulan pembanding <b>${esc(r.basePeriod)}</b>: ${esc(r.baseLabel)}<br>` +
+    `Dihitung: ${esc(r.generatedAt)}`;
+
+  const rk = r.ringkasan || {};
+  const totChange = (rk['MASUK'] || 0) + (rk['KELUAR'] || 0) + (rk['NAIK GRADE'] || 0) + (rk['TURUN GRADE'] || 0) + (rk['PERUBAHAN DATA'] || 0);
+  $('mgTotTarget').textContent = mgNum(r.totalTarget);
+  $('mgTotBase').textContent = mgNum(r.totalBase);
+  $('mgTotChange').textContent = mgNum(totChange);
+  $('mgTotSelisih').textContent = (r.selisihTotalRp < 0 ? '−Rp ' : 'Rp ') + Math.abs(r.selisihTotalRp || 0).toLocaleString('id-ID');
+
+  $('mgSaveWebBtn').classList.toggle('hidden', !r.canWrite);
+  $('mgTablePolri').innerHTML = mgRekapHtml(r.rekapPolri, 'Baris POLRI UMUM', 'Baris POLRI TIPIKOR', r);
+  $('mgTablePns').innerHTML = mgRekapHtml(r.rekapPns, 'PNS', 'PPPK', r);
+  mgRenderCheck(r);
+  renderMgChips();
+  renderMgChanges();
+
+  const ap = r.riwayatDipakai || [];
+  $('mgRiwayatCard').classList.toggle('hidden', r.baseType !== 'RIWAYAT');
+  $('mgRiwayatRows').innerHTML = ap.length
+    ? ap.map(a => `<tr><td>${esc(a.waktu)}</td><td>${esc(a.nrp)}</td><td>${esc(a.nama)}</td><td>${esc(a.aksi)}</td></tr>`).join('')
+    : '<tr><td colspan="4" class="muted">Tidak ada catatan riwayat sejak tanggal acuan; data pembanding = DATABASE saat ini.</td></tr>';
+}
+
+function mgRekapHtml(rek, subA, subB, r) {
+  const kel = rek.kelompok;
+  const head = `<thead><tr>
+    <th>Grade</th><th>Indeks Tunkin (Rp)</th><th>${esc(rek.labelA)}</th><th>${esc(rek.labelB)}</th><th>Total Manual</th>
+    <th>Bulan Lalu<br>(${esc(r.basePeriod)})</th><th>Perubahan</th>
+    <th>Web (PDF)</th><th>Selisih Orang<br>(Manual - Web)</th><th>Tunkin Manual (Rp)<br>(Total x Indeks)</th>
+    <th>Tunkin Web (Rp)<br>(Web x Indeks)</th><th>Selisih Rp</th><th>Status</th></tr></thead>`;
+  const body = rek.rows.map(x => {
+    const chgCls = x.perubahan > 0 ? 'up' : (x.perubahan < 0 ? 'down' : '');
+    const webCell = r.canWrite
+      ? `<input type="number" min="0" step="1" class="mg-web-input" data-kel="${kel}" data-grade="${esc(x.grade)}" value="${x.web === null ? '' : x.web}" oninput="mgRecalcRow(this)">`
+      : (x.web === null ? '' : mgNum(x.web));
+    return `<tr data-kel="${kel}" data-grade="${esc(x.grade)}" data-total="${x.total}" data-idx="${x.indeks}">
+      <td class="c">${esc(x.grade)}</td>
+      <td class="idx">${x.indeks ? mgNum(x.indeks) : '<span style="color:#b91c1c">TANPA TARIF</span>'}</td>
+      <td>${mgNum(x.a)}</td><td>${mgNum(x.b)}</td><td><b>${mgNum(x.total)}</b></td>
+      <td>${mgNum(x.lalu)}</td><td class="${chgCls}">${mgSigned(x.perubahan)}</td>
+      <td class="web">${webCell}</td>
+      <td class="so">${x.selisihOrang === null ? '' : mgNum(x.selisihOrang)}</td>
+      <td>${mgNum(x.tunkinManual)}</td>
+      <td class="tw">${x.tunkinWeb === null ? '' : mgNum(x.tunkinWeb)}</td>
+      <td class="sr">${x.selisihRp === null ? '' : mgNum(x.selisihRp)}</td>
+      <td class="st"><span class="mg-st ${mgStClass(x.status)}">${esc(x.status)}</span></td>
+    </tr>`;
+  }).join('');
+  const t = rek.totals;
+  const chgCls = t.perubahan > 0 ? 'up' : (t.perubahan < 0 ? 'down' : '');
+  const foot = `<tr class="tot" data-kel-total="${kel}">
+    <td class="c" colspan="2">TOTAL</td><td>${mgNum(t.a)}</td><td>${mgNum(t.b)}</td><td>${mgNum(t.total)}</td>
+    <td>${mgNum(t.lalu)}</td><td class="${chgCls}">${mgSigned(t.perubahan)}</td>
+    <td class="tweb">${t.web === null ? '' : mgNum(t.web)}</td><td class="tso">${t.selisihOrang === null ? '' : mgNum(t.selisihOrang)}</td>
+    <td>${mgNum(t.tunkinManual)}</td><td class="ttw">${t.tunkinWeb === null ? '' : mgNum(t.tunkinWeb)}</td>
+    <td class="tsr">${t.selisihRp === null ? '' : mgNum(t.selisihRp)}</td>
+    <td class="tst"><span class="mg-st ${mgStClass(t.status)}">${esc(t.status)}</span></td></tr>`;
+  return head + '<tbody>' + body + foot + '</tbody>';
+}
+
+function mgRecalcRow(inp) {
+  const tr = inp.closest('tr');
+  const total = Number(tr.dataset.total || 0), idx = Number(tr.dataset.idx || 0);
+  const raw = inp.value.trim();
+  const st = tr.querySelector('.st');
+  if (raw === '') {
+    tr.querySelector('.so').textContent = '';
+    tr.querySelector('.tw').textContent = '';
+    tr.querySelector('.sr').textContent = '';
+    const s = total === 0 ? 'SESUAI' : 'BELUM INPUT WEB';
+    st.innerHTML = `<span class="mg-st ${mgStClass(s)}">${s}</span>`;
+  } else {
+    const w = Number(raw) || 0;
+    tr.querySelector('.so').textContent = mgNum(total - w);
+    tr.querySelector('.tw').textContent = mgNum(w * idx);
+    tr.querySelector('.sr').textContent = mgNum(total * idx - w * idx);
+    const s = total === w ? 'SESUAI' : 'TIDAK SESUAI';
+    st.innerHTML = `<span class="mg-st ${mgStClass(s)}">${s}</span>`;
+  }
+  mgRecalcTotals(tr.dataset.kel);
+}
+
+function mgRecalcTotals(kel) {
+  const rows = Array.from(document.querySelectorAll(`tr[data-kel="${kel}"][data-grade]`));
+  let web = 0, any = false, tw = 0, total = 0, tm = 0, allOk = true, anyBad = false;
+  rows.forEach(tr => {
+    const t = Number(tr.dataset.total || 0), idx = Number(tr.dataset.idx || 0);
+    const inp = tr.querySelector('.mg-web-input');
+    const raw = inp ? inp.value.trim() : '';
+    total += t; tm += t * idx;
+    if (raw !== '') {
+      any = true; const w = Number(raw) || 0; web += w; tw += w * idx;
+      if (w !== t) { allOk = false; anyBad = true; }
+    } else if (t !== 0) allOk = false;
+  });
+  const tot = document.querySelector(`tr[data-kel-total="${kel}"]`);
+  if (!tot) return;
+  tot.querySelector('.tweb').textContent = any ? mgNum(web) : '';
+  tot.querySelector('.tso').textContent = any ? mgNum(total - web) : '';
+  tot.querySelector('.ttw').textContent = any ? mgNum(tw) : '';
+  tot.querySelector('.tsr').textContent = any ? mgNum(tm - tw) : '';
+  const s = allOk ? 'SESUAI' : (anyBad ? 'TIDAK SESUAI' : 'BELUM INPUT WEB');
+  tot.querySelector('.tst').innerHTML = `<span class="mg-st ${mgStClass(s)}">${s}</span>`;
+}
+
+function saveMonitoringGradeWeb() {
+  if (!mgCache) return;
+  const items = Array.from(document.querySelectorAll('.mg-web-input')).map(i => ({
+    kelompok: i.dataset.kel, grade: i.dataset.grade, jumlah: i.value.trim()
+  }));
+  msg('Menyimpan jumlah Web (PDF)...', 'notice');
+  call('saveRekapGradeWeb', [{ period: mgCache.period, items: items }], r => {
+    msg(r.message, 'success');
+    loadMonitoringGrade();
+  });
+}
+
+function mgRenderCheck(r) {
+  const P = r.rekapPolri.totals, N = r.rekapPns.totals;
+  const line = (label, sheet, pdf) => {
+    const has = pdf !== null && pdf !== undefined;
+    const sel = has ? sheet - pdf : null;
+    const s = !has ? 'BELUM INPUT WEB' : (sel === 0 ? 'SESUAI' : 'TIDAK SESUAI');
+    return `<tr><td style="text-align:left;">${esc(label)}</td><td>${mgNum(sheet)}</td><td class="idx">${has ? mgNum(pdf) : ''}</td><td>${has ? mgNum(sel) : ''}</td><td class="c"><span class="mg-st ${mgStClass(s)}">${s}</span></td></tr>`;
+  };
+  const sumOrNull = (a, b) => (a === null && b === null) ? null : (Number(a || 0) + Number(b || 0));
+  const chk = r.pemeriksaan || {};
+  const cnt = (label, arr) => {
+    const n = (arr || []).length;
+    const s = n ? 'PERLU DICEK' : 'SESUAI';
+    return `<tr><td style="text-align:left;">${esc(label)}</td><td>${mgNum(n)}</td><td class="idx">0</td><td>${mgNum(n)}</td><td class="c"><span class="mg-st ${n ? 'warn' : 'ok'}">${s}</span></td></tr>`;
+  };
+  $('mgTableCheck').innerHTML = `<thead><tr><th>Uraian</th><th>Nilai Sheet / Aplikasi</th><th>Nilai PDF / Seharusnya</th><th>Selisih</th><th>Status</th></tr></thead><tbody>
+    ${line('Total personel Polri (aplikasi vs total di PDF)', P.total, P.web)}
+    ${line('Total personel PNS + PPPK (aplikasi vs total di PDF)', N.total, N.web)}
+    ${line('Total tunkin Polri (Rp)', P.tunkinManual, P.tunkinWeb)}
+    ${line('Total tunkin PNS + PPPK (Rp)', N.tunkinManual, N.tunkinWeb)}
+    ${line('Total seluruh personel', P.total + N.total, sumOrNull(P.web, N.web))}
+    ${line('Total seluruh tunkin (Rp)', P.tunkinManual + N.tunkinManual, sumOrNull(P.tunkinWeb, N.tunkinWeb))}
+    ${cnt('Personel aktif tanpa grade', chk.tanpaGrade)}
+    ${cnt('Grade tanpa tarif di APP_TARIF', chk.tanpaTarif)}
+    ${cnt('NRP/NIP ganda di data bulan target', chk.duplikat)}
+    ${cnt('Grade POLRI tidak sama dengan grade standar pangkat', chk.gradeTidakSesuaiPangkat)}
+  </tbody>`;
+
+  const blocks = [];
+  const lst = (title, arr, fmt) => {
+    if (!arr || !arr.length) return;
+    blocks.push(`<div class="notice error" style="margin-top:10px;"><strong>${esc(title)} (${arr.length})</strong><ul class="mg-check-list">${arr.slice(0, 50).map(x => '<li>' + fmt(x) + '</li>').join('')}</ul>${arr.length > 50 ? '<div>… dan ' + (arr.length - 50) + ' lainnya</div>' : ''}</div>`);
+  };
+  lst('Personel aktif tanpa grade', chk.tanpaGrade, x => `${esc(x.nama)} (${esc(x.nrp)}) — ${esc(x.jenis)} ${esc(x.pangkat)}`);
+  lst('Grade belum punya tarif', chk.tanpaTarif, x => `${esc(x.nama)} (${esc(x.nrp)}) — grade ${esc(x.grade)}`);
+  lst('NRP/NIP ganda', chk.duplikat, x => `${esc(x.nama)} (${esc(x.nrp)})`);
+  lst('Grade tidak sama dengan grade standar pangkat (cek apakah memang ketetapan khusus)', chk.gradeTidakSesuaiPangkat, x => `${esc(x.nama)} (${esc(x.nrp)}) — ${esc(x.pangkat)}: grade ${esc(x.grade)}, standar ${esc(x.gradeStandar)}`);
+  $('mgCheckDetail').innerHTML = blocks.join('');
+}
+
+function renderMgChips() {
+  const rk = (mgCache && mgCache.ringkasan) || {};
+  const totChange = (rk['MASUK'] || 0) + (rk['KELUAR'] || 0) + (rk['NAIK GRADE'] || 0) + (rk['TURUN GRADE'] || 0) + (rk['PERUBAHAN DATA'] || 0);
+  const chips = [
+    ['BERUBAH', 'Semua Perubahan', totChange],
+    ['MASUK', 'Masuk', rk['MASUK'] || 0],
+    ['KELUAR', 'Keluar', rk['KELUAR'] || 0],
+    ['NAIK GRADE', 'Naik Grade', rk['NAIK GRADE'] || 0],
+    ['TURUN GRADE', 'Turun Grade', rk['TURUN GRADE'] || 0],
+    ['PERUBAHAN DATA', 'Pangkat/Jabatan/Jenis', rk['PERUBAHAN DATA'] || 0],
+    ['SEMUA', 'Seluruh Personel', (mgCache && mgCache.changes || []).length]
+  ];
+  $('mgChips').innerHTML = chips.map(c =>
+    `<button type="button" class="mg-chip ${mgFilter === c[0] ? 'active' : ''}" onclick="mgSetFilter('${c[0]}')">${esc(c[1])}<span class="n">${c[2]}</span></button>`
+  ).join('');
+}
+
+function mgSetFilter(f) { mgFilter = f; renderMgChips(); renderMgChanges(); }
+
+function mgFilteredChanges() {
+  const kw = ($('mgSearch').value || '').trim().toLowerCase();
+  return ((mgCache && mgCache.changes) || []).filter(c => {
+    if (mgFilter === 'BERUBAH' && c.kategori === 'TETAP') return false;
+    if (mgFilter !== 'BERUBAH' && mgFilter !== 'SEMUA' && c.kategori !== mgFilter) return false;
+    if (!kw) return true;
+    return String(c.nama).toLowerCase().includes(kw) || String(c.nrp).toLowerCase().includes(kw);
+  });
+}
+
+function mgKatClass(k) {
+  return { 'MASUK': 'k-masuk', 'KELUAR': 'k-keluar', 'NAIK GRADE': 'k-naik', 'TURUN GRADE': 'k-turun', 'PERUBAHAN DATA': 'k-data' }[k] || 'k-tetap';
+}
+
+function renderMgChanges() {
+  if (!mgCache) return;
+  const list = mgFilteredChanges();
+  $('mgChangeRows').innerHTML = list.length ? list.map((c, i) => {
+    const gChanged = String(c.gradeLama) !== String(c.gradeBaru);
+    const pChanged = String(c.pangkatLama).toUpperCase() !== String(c.pangkatBaru).toUpperCase();
+    const gradeHtml = gChanged
+      ? `<span class="mg-grade-chg">${c.gradeLama ? `<span class="old">${esc(c.gradeLama)}</span>` : ''}${c.gradeBaru ? esc(c.gradeBaru) : '<span style="color:#b91c1c">—</span>'}</span>`
+      : esc(c.gradeBaru);
+    const pangkatHtml = pChanged
+      ? `${c.pangkatLama ? `<span style="color:#94a3b8;text-decoration:line-through;">${esc(c.pangkatLama)}</span> ` : ''}${esc(c.pangkatBaru || '—')}`
+      : esc(c.pangkatBaru);
+    const selCls = c.selisihRp > 0 ? 'color:#15803d;font-weight:800;' : (c.selisihRp < 0 ? 'color:#b91c1c;font-weight:800;' : '');
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><span class="mg-kat ${mgKatClass(c.kategori)}">${esc(c.kategori)}</span></td>
+      <td>${esc(c.nrp)}</td><td>${esc(c.nama)}</td><td>${esc(c.jenis)}</td>
+      <td>${pangkatHtml}</td><td>${gradeHtml}</td>
+      <td class="num-col">${c.tunkinLama ? mgNum(c.tunkinLama) : '-'}</td>
+      <td class="num-col">${c.tunkinBaru ? mgNum(c.tunkinBaru) : '-'}</td>
+      <td class="num-col" style="${selCls}">${mgSigned(c.selisihRp)}</td>
+      <td style="white-space:normal;min-width:220px;">${esc(c.keterangan)}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="11" class="muted">Tidak ada data untuk filter ini.</td></tr>';
+}
+
+function mgPrint() {
+  document.body.classList.add('mg-printing');
+  const done = () => { document.body.classList.remove('mg-printing'); window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  window.print();
+  setTimeout(done, 1500);
+}
+
+function mgDownloadCsv() {
+  if (!mgCache) return;
+  const list = mgFilteredChanges();
+  const head = ['KATEGORI', 'NRP/NIP', 'NAMA', 'JENIS', 'PANGKAT LAMA', 'PANGKAT BARU', 'GRADE LAMA', 'GRADE BARU', 'JABATAN LAMA', 'JABATAN BARU', 'TUNKIN LAMA', 'TUNKIN BARU', 'SELISIH', 'KETERANGAN'];
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lines = [head.map(q).join(';')].concat(list.map(c => [
+    c.kategori, "'" + c.nrp, c.nama, c.jenis, c.pangkatLama, c.pangkatBaru, c.gradeLama, c.gradeBaru,
+    c.jabatanLama, c.jabatanBaru, c.tunkinLama, c.tunkinBaru, c.selisihRp, c.keterangan
+  ].map(q).join(';')));
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `perubahan_grade_${mgCache.basePeriod}_ke_${mgCache.period}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 
 function loadHistory() {
