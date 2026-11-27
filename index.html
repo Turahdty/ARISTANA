@@ -1339,6 +1339,19 @@
     .mg-grade-chg .old { color: #94a3b8; text-decoration: line-through; margin-right: 4px; }
     .mg-check-list { margin: 6px 0 0 18px; padding: 0; font-size: 12px; }
     @media (max-width: 760px) { .mg-status-bar { grid-template-columns: 1fr; } }
+
+    /* ===================== POPUP PRATINJAU SURAT PENCAIRAN TUNKIN ===================== */
+    .surat-modal-box { max-width: 1080px; max-height: 94vh; display: flex; flex-direction: column; }
+    .surat-modal-body { padding: 14px 16px; overflow-y: auto; }
+    .surat-prev-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; }
+    .surat-prev-frame { width: 100%; height: 68vh; border: 1px solid var(--sakti-border); border-radius: 6px; background: #e2e8f0; }
+    .surat-prev-side { display: flex; flex-direction: column; gap: 10px; }
+    .surat-sum-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+    .surat-sum-table td { padding: 5px 7px; border: 1px solid var(--sakti-border); white-space: normal; }
+    .surat-sum-table td:last-child { text-align: right; font-family: 'Consolas', monospace; font-weight: 700; }
+    .surat-sum-table tr.tot td { background: var(--sakti-navy); color: #fff; }
+    .surat-busy { text-align: center; padding: 60px 10px; color: var(--sakti-muted); font-weight: 600; }
+    @media (max-width: 900px) { .surat-prev-grid { grid-template-columns: 1fr; } .surat-prev-frame { height: 55vh; } }
     @media print {
       body.mg-printing * { visibility: hidden; }
       body.mg-printing #monitor-grade, body.mg-printing #monitor-grade * { visibility: visible; }
@@ -1724,7 +1737,7 @@
               </div>
               <div class="actions" id="suratActionWrap" style="margin-top:6px;">
                 <button type="button" class="primary" id="buatSuratBtn" onclick="buatSuratTunkin()">Buat Surat Pengantar Pencairan (Docs)</button>
-                <button type="button" class="success-btn" onclick="buatRekapPencairan()">Buat Rekap Pencairan Bank (4 Sheet Otomatis)</button>
+                <button type="button" class="success-btn" onclick="buatRekapPencairan()">Buat File Bayar Tunkin &amp; Surat Bank (4 Sheet)</button>
                 <button type="button" class="gold-btn" onclick="openMonitoringImportShortcut()">📋 Import / Copas Monitoring Gaji</button>
                 <button type="button" class="gold-btn" onclick="showSubSection('import-excel')">📥 Import Excel Gaji (POLRI &amp; PNS)</button>
                 <button type="button" class="secondary" onclick="arsipkanGajiBulanIni()">💾 Arsipkan Monitoring Gaji Bulan Ini</button>
@@ -2405,6 +2418,42 @@
     </footer>
   </div>
 
+  <!-- POPUP PRATINJAU SURAT PENCAIRAN TUNKIN (cek kebenaran sebelum disetujui) -->
+  <div id="suratPreviewModal" class="modal-backdrop hidden">
+    <div class="modal-box surat-modal-box">
+      <div class="modal-head">
+        <strong>📄 Pratinjau Surat Pengantar Pencairan Tunkin</strong>
+        <button type="button" onclick="batalSuratTunkin()" style="background:none;border:0;color:#fff;font-size:18px;cursor:pointer;" aria-label="Tutup">✕</button>
+      </div>
+      <div class="surat-modal-body">
+        <div id="suratPreviewErr" class="notice error hidden"></div>
+        <div id="suratBusy" class="surat-busy hidden">Menyusun draf surat dari template...</div>
+        <div id="suratPreviewContent" class="surat-prev-grid hidden">
+          <iframe id="suratPreviewFrame" class="surat-prev-frame" title="Pratinjau surat"></iframe>
+          <div class="surat-prev-side">
+            <div>
+              <label for="suratNomorUrut">Nomor Urut Surat</label>
+              <div style="display:flex;gap:6px;">
+                <input id="suratNomorUrut" type="text" placeholder="mis. 19" onkeydown="if(event.key==='Enter')generateSuratPreview()">
+                <button type="button" class="secondary" onclick="generateSuratPreview()">Perbarui</button>
+              </div>
+              <div class="muted" style="margin-top:4px;">Nomor surat: <strong id="suratNomorFull">-</strong></div>
+            </div>
+            <table class="surat-sum-table" id="suratSumTable"></table>
+            <div class="muted">Nominal = jumlah permintaan tunkin POLRI Umum, Tipikor &amp; PPPK. PNS tidak termasuk (dibayar via SPAN).</div>
+            <div id="suratWarnBox" class="notice hidden" style="margin:0;background:#fffbeb;border-left-color:#f59e0b;color:#92400e;font-size:12px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="actions" style="padding:12px 16px;margin:0;border-top:1px solid var(--sakti-border);justify-content:flex-end;">
+        <a id="suratDraftLink" href="#" target="_blank" rel="noopener" class="hidden" style="align-self:center;margin-right:auto;font-size:12px;">Buka Draf di Docs</a>
+        <button type="button" class="secondary" onclick="batalSuratTunkin()">Batal</button>
+        <button type="button" class="secondary" id="btnSuratPrint" onclick="cetakPreviewSurat()" disabled>🖨️ Cetak</button>
+        <button type="button" class="success-btn" id="btnSuratApprove" onclick="setujuiSuratTunkin()" disabled>✔ Data Benar — Simpan Surat</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL UBAH PASSWORD MANDIRI (SEMUA USER: PERSONEL / OPERATOR / ADMIN) -->
   <div id="changePasswordModal" class="modal-backdrop hidden">
     <div class="modal-box">
@@ -2921,6 +2970,7 @@ function logoutSession() {
   if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.add('hidden');
   if ($('petikanGajiPanel')) $('petikanGajiPanel').classList.add('hidden');
   if ($('importMonitoringPanel')) $('importMonitoringPanel').classList.add('hidden');
+  if ($('suratPreviewModal')) $('suratPreviewModal').classList.add('hidden');
   $('loginMsg').classList.add('hidden');
   showLoginPageOnly();
 }
@@ -4261,35 +4311,160 @@ function arsipkanGajiBulanIni() {
   });
 }
 
+let suratState = { draftId: '', nomorSurat: '', nomorUrut: '', totalBayar: 0, blobUrl: '', draftUrl: '' };
+
+function suratBase64ToBlobUrl(b64) {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return URL.createObjectURL(new Blob([arr], { type: 'application/pdf' }));
+}
+
+function suratRevokeBlob() {
+  if (suratState.blobUrl) { try { URL.revokeObjectURL(suratState.blobUrl); } catch (e) {} }
+  suratState.blobUrl = '';
+}
+
+function setSuratBusy(busy, text) {
+  $('suratBusy').textContent = text || 'Menyusun draf surat dari template...';
+  $('suratBusy').classList.toggle('hidden', !busy);
+  if (busy) $('suratPreviewContent').classList.add('hidden');
+  $('btnSuratApprove').disabled = true;
+  $('btnSuratPrint').disabled = true;
+}
+
 function buatSuratTunkin() {
   const period = $('periodDash').value;
   if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
-  const btn = $('buatSuratBtn');
+  suratState = { draftId: '', nomorSurat: '', nomorUrut: '', totalBayar: 0, blobUrl: '', draftUrl: '' };
+  $('suratNomorUrut').value = '';
+  $('suratPreviewErr').classList.add('hidden');
+  $('suratDraftLink').classList.add('hidden');
+  $('suratPreviewModal').classList.remove('hidden');
+  generateSuratPreview();
+}
+
+function generateSuratPreview() {
+  const period = $('periodDash').value;
+  if (!period) return;
+  $('suratPreviewErr').classList.add('hidden');
+  setSuratBusy(true, 'Menyusun draf surat dari template...');
+
+  runGasApi('previewSuratPencairanTunkin', [{
+      periode: period,
+      nomorUrut: $('suratNomorUrut').value.trim(),
+      draftId: suratState.draftId
+    }, authToken])
+    .then(r => {
+      setSuratBusy(false);
+      if (!r || !r.ok) throw new Error('Gagal menyusun pratinjau surat.');
+      suratState.draftId = r.draftId;
+      suratState.nomorSurat = r.nomorSurat;
+      suratState.nomorUrut = r.nomorUrut;
+      suratState.totalBayar = r.totalBayar;
+      suratState.draftUrl = r.draftUrl;
+
+      $('suratNomorUrut').value = r.nomorUrut;
+      $('suratNomorFull').textContent = r.nomorSurat;
+
+      const pj = r.perJenis || {};
+      const baris = ['POLRI UMUM', 'POLRI TIPIKOR', 'PPPK'].map(j =>
+        `<tr><td>${esc(j)} (${(pj[j] && pj[j].jumlah) || 0} org)</td><td>Rp ${formatMoney((pj[j] && pj[j].nominal) || 0)}</td></tr>`
+      ).join('');
+      $('suratSumTable').innerHTML =
+        `<tr><td>Bulan</td><td>${esc(r.bulanTahun)}</td></tr>` + baris +
+        `<tr class="tot"><td>Jumlah Pencairan (${r.jumlahPersonel} org)</td><td>Rp ${formatMoney(r.totalBayar)}</td></tr>` +
+        `<tr><td colspan="2" style="text-align:left;font-family:inherit;font-weight:600;">Terbilang: ${esc(r.terbilang)}</td></tr>`;
+
+      const wb = $('suratWarnBox');
+      if (r.warnings && r.warnings.length) {
+        wb.innerHTML = '<strong>Perhatian:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + r.warnings.map(w => '<li>' + esc(w) + '</li>').join('') + '</ul>';
+        wb.classList.remove('hidden');
+      } else {
+        wb.classList.add('hidden');
+      }
+
+      suratRevokeBlob();
+      if (r.pdfBase64) {
+        suratState.blobUrl = suratBase64ToBlobUrl(r.pdfBase64);
+        $('suratPreviewFrame').src = suratState.blobUrl;
+        $('btnSuratPrint').disabled = false;
+      } else {
+        $('suratPreviewFrame').removeAttribute('src');
+      }
+
+      const dl = $('suratDraftLink');
+      dl.href = safeUrl(r.draftUrl);
+      dl.classList.remove('hidden');
+
+      $('suratPreviewContent').classList.remove('hidden');
+      $('btnSuratApprove').disabled = false;
+    })
+    .catch(err => {
+      setSuratBusy(false);
+      $('suratPreviewErr').textContent = err && err.message ? err.message : String(err);
+      $('suratPreviewErr').classList.remove('hidden');
+    });
+}
+
+function cetakPreviewSurat() {
+  if (!suratState.blobUrl) return;
+  try {
+    const f = $('suratPreviewFrame');
+    f.contentWindow.focus();
+    f.contentWindow.print();
+  } catch (e) {
+    window.open(suratState.blobUrl, '_blank');
+  }
+}
+
+function setujuiSuratTunkin() {
+  if (!suratState.draftId) return;
+  const btn = $('btnSuratApprove');
   btn.disabled = true;
-  btn.textContent = 'Membuat Dokumen...';
-  call('buatSuratPengantarTunkin', [period], r => {
-    btn.disabled = false;
-    btn.textContent = 'Buat Surat Pengantar Pencairan (Docs)';
-    const e = $('message');
-    e.className = 'notice success';
-    e.classList.remove('hidden');
-    e.innerHTML = 'Surat berhasil dibuat: <a href="' + safeUrl(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
-  }, () => {
-    btn.disabled = false;
-    btn.textContent = 'Buat Surat Pengantar Pencairan (Docs)';
-  });
+  btn.textContent = 'Menyimpan...';
+  runGasApi('finalisasiSuratPencairanTunkin', [{
+      draftId: suratState.draftId,
+      nomorUrut: suratState.nomorUrut,
+      nomorSurat: suratState.nomorSurat,
+      totalBayar: suratState.totalBayar
+    }, authToken])
+    .then(r => {
+      btn.textContent = '✔ Data Benar — Simpan Surat';
+      suratRevokeBlob();
+      suratState.draftId = '';
+      $('suratPreviewModal').classList.add('hidden');
+      const e = $('message');
+      e.className = 'notice success';
+      e.classList.remove('hidden');
+      e.innerHTML = 'Surat pencairan tunkin disimpan (' + esc(suratState.nomorSurat) + '): <a href="' + safeUrl(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a>';
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.textContent = '✔ Data Benar — Simpan Surat';
+      $('suratPreviewErr').textContent = err && err.message ? err.message : String(err);
+      $('suratPreviewErr').classList.remove('hidden');
+    });
+}
+
+function batalSuratTunkin() {
+  const id = suratState.draftId;
+  suratRevokeBlob();
+  suratState.draftId = '';
+  $('suratPreviewModal').classList.add('hidden');
+  if (id) runGasApi('batalkanDrafSuratPencairanTunkin', [id, authToken]).catch(() => {});
 }
 
 function buatRekapPencairan() {
   const period = $('periodDash').value;
   if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
-  msg('Sedang membuat Spreadsheet Rekap Pencairan Bank (4 Sheet otomatis)...', 'notice');
+  msg('Sedang membuat Spreadsheet Bayar Tunkin (Sheet1-4, siap cetak)...', 'notice');
   call('buatRekapPencairanBank', [period, ''], r => {
     const e = $('message');
     e.className = 'notice success';
     e.classList.remove('hidden');
     e.innerHTML = 'Rekap Pencairan Bank berhasil dibuat: <a href="' + safeUrl(r.url) + '" target="_blank" rel="noopener"><strong>' + esc(r.name) + '</strong></a> '
-      + '(Bayar: Rp ' + formatMoney(r.jumlahBayar) + ' | Potongan: Rp ' + formatMoney(r.jumlahPotongan) + ')';
+      + '(Bayar: Rp ' + formatMoney(r.jumlahBayar) + ' | Potongan: Rp ' + formatMoney(r.jumlahPotongan) + ' | Nomor surat potongan: ' + esc(r.nomorSuratDebet || '-') + ')';
   });
 }
 
