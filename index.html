@@ -1647,7 +1647,7 @@
             <div class="card lock-card">
               <div style="font-size:38px;margin-bottom:10px;">🔒</div>
               <h3 style="margin:0 0 8px;color:var(--sakti-navy);">Otorisasi Diperlukan: Modul Permintaan Tunkin</h3>
-              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. Akun personel (Viewer) memiliki akses penuh pada menu Monitoring Gaji &amp; Tunkin.</p>
+              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. KASATKER dapat melihat seluruh data Monitoring Gaji &amp; Tunkin (read-only); Viewer hanya dapat melihat data miliknya sendiri.</p>
             </div>
           </section>
 
@@ -1886,7 +1886,7 @@
                 <div class="field"><label for="accUser">Username / NRP / NIP *</label><input id="accUser"></div>
                 <div class="field"><label for="accPass">Password *</label><input id="accPass"></div>
                 <div class="field"><label for="accNama">Nama User / Personel *</label><input id="accNama"></div>
-                <div class="field"><label for="accRole">Role *</label><select id="accRole"><option value="VIEWER">VIEWER (Personel)</option><option value="OPERATOR">OPERATOR</option><option value="ADMIN">ADMIN</option></select></div>
+                <div class="field"><label for="accRole">Role *</label><select id="accRole"><option value="VIEWER">VIEWER (Personel)</option><option value="KASATKER">KASATKER (Pimpinan)</option><option value="OPERATOR">OPERATOR</option><option value="ADMIN">ADMIN</option></select></div>
                 <div class="field"><label for="accAktif">Status</label><select id="accAktif"><option value="YA">AKTIF</option><option value="TIDAK">NONAKTIF</option></select></div>
               </div>
               <div class="actions">
@@ -1908,7 +1908,7 @@
             <div class="card lock-card">
               <div style="font-size:38px;margin-bottom:10px;">🔒</div>
               <h3 style="margin:0 0 8px;color:var(--sakti-navy);">Otorisasi Diperlukan: Modul Pembuatan SPPD</h3>
-              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. Akun personel (Viewer) memiliki akses penuh pada menu Monitoring Gaji &amp; Tunkin.</p>
+              <p class="muted">Modul ini khusus untuk <strong>ADMIN</strong> dan <strong>OPERATOR</strong>. KASATKER dapat melihat seluruh data Monitoring Gaji &amp; Tunkin (read-only); Viewer hanya dapat melihat data miliknya sendiri.</p>
             </div>
           </section>
 
@@ -2658,7 +2658,7 @@ function switchTopMenu(topKey) {
 
   if (!appPermissions.canWrite) {
     $('sideHeading').innerHTML = '<span>OTORISASI MODUL</span>';
-    $('sideDynamicArea').innerHTML = '<div style="padding:8px;font-size:12px;color:#cbd5e1;">Akun personel (Viewer) dapat melihat seluruh data Monitoring Gaji &amp; Tunkin serta mengubah password akun.</div>';
+    $('sideDynamicArea').innerHTML = '<div style="padding:8px;font-size:12px;color:#cbd5e1;">KASATKER dapat melihat seluruh data Monitoring Gaji &amp; Tunkin tanpa hak edit. Viewer hanya dapat melihat data miliknya sendiri.</div>';
     $('lock-' + topKey).classList.remove('hidden');
     $('pageTitle').textContent = topKey === 'req-tunkin' ? 'Modul Permintaan Tunkin' : (topKey === 'sppd' ? 'Modul Pembuatan SPPD' : 'Modul Perhitungan Pajak');
     $('subTitle').textContent = 'Beranda / Khusus Admin & Operator';
@@ -2892,8 +2892,12 @@ function init(refreshTab = false) {
       if ($('adminOperatorMonBar')) $('adminOperatorMonBar').classList.remove('hidden');
     } else {
       badge.className = 'sakti-status-chip viewer';
-      badge.textContent = 'PERSONEL: ' + d.user.name + (d.user.nrp ? ' (' + d.user.nrp + ')' : '');
-      $('userInfo').textContent = d.user.name + ' • Akses Monitoring Gaji & Tunkin';
+      badge.textContent = d.user.role === 'KASATKER'
+        ? 'KASATKER: ' + d.user.name
+        : 'PERSONEL: ' + d.user.name + (d.user.nrp ? ' (' + d.user.nrp + ')' : '');
+      $('userInfo').textContent = d.user.name + (d.user.role === 'KASATKER'
+        ? ' • Monitoring Seluruh Personel (Read Only)'
+        : ' • Monitoring Gaji & Tunkin Pribadi');
       if ($('tab-req-tunkin')) $('tab-req-tunkin').classList.add('hidden');
       if ($('tab-sppd')) $('tab-sppd').classList.add('hidden');
       if ($('tab-pajak')) $('tab-pajak').classList.add('hidden');
@@ -4054,18 +4058,19 @@ function renderKartuRincianTerpadu(index, listSource) {
         <div class="sub-box">
           <div class="sub-box-title">
             <span>2. TUNKIN &amp; POTONGAN TUNKIN</span>
-            <span>Sisa: Rp ${formatMoney(item.sisaTunkin)}</span>
+            <span>Bruto: Rp ${formatMoney(item.tunkinBruto)}</span>
           </div>
           <div class="rincian-grid">
             <div class="rincian-item"><span>Tunkin Bruto</span><b>Rp ${formatMoney(item.tunkinBruto)}</b></div>
             <div class="rincian-item pot"><span>Pajak Tunkin (PPPK)</span><b>Rp ${formatMoney(item.pajakTunkin)}</b></div>
             <div class="rincian-item pot"><span>Kurang Sakit/Izin</span><b>Rp ${formatMoney(item.kurangAbsen)}</b></div>
             <div class="rincian-item"><span>Bayar Tunkin</span><b>Rp ${formatMoney(item.bayarTunkin)}</b></div>
-            <div class="rincian-item pot"><span>Total Pot. Tunkin</span><b>Rp ${formatMoney(item.totalPotTunkin)}</b></div>
             <div class="rincian-item pot"><span>Pot. Koperasi</span><b>Rp ${formatMoney(item.potKop)}</b></div>
             <div class="rincian-item pot"><span>Pot. Letting</span><b>Rp ${formatMoney(item.potLet)}</b></div>
             <div class="rincian-item pot"><span>Pot. Polwan</span><b>Rp ${formatMoney(item.potPol)}</b></div>
             <div class="rincian-item pot" style="grid-column:1 / -1;"><span>Pot. Lain Tunkin</span><b>Rp ${formatMoney(item.potLainTunkin)}</b></div>
+            <div class="rincian-item pot" style="grid-column:1 / -1;"><span>Total Potongan Tunkin</span><b>Rp ${formatMoney(item.totalPotTunkin)}</b></div>
+            <div class="rincian-item pot" style="grid-column:1 / -1;"><span>TOTAL POTONGAN (GAJI + TUNKIN)</span><b>Rp ${formatMoney(item.totalPotGabungan)}</b></div>
             <div class="rincian-item bersih" style="grid-column:1 / -1;"><span>Sisa Tunkin Diterima</span><b>Rp ${formatMoney(item.sisaTunkin)}</b></div>
           </div>
         </div>
