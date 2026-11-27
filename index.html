@@ -1682,6 +1682,7 @@
                 <button type="button" class="gold-btn" onclick="showSubSection('import-excel')">📥 Import Excel Gaji (POLRI &amp; PNS)</button>
                 <button type="button" class="secondary" onclick="arsipkanGajiBulanIni()">💾 Arsipkan Monitoring Gaji Bulan Ini</button>
                 <button type="button" class="secondary" onclick="sinkronPotongan()">Sinkronkan Potongan Koperasi &amp; Tetap</button>
+                <button type="button" class="secondary" onclick="sinkronSnapshotTunkin()">🔄 Sinkronkan Snapshot dengan Database Personel</button>
                 <button type="button" class="secondary" onclick="backupArsip()">Backup Arsip Data</button>
               </div>
               <div class="muted">Snapshot membekukan perhitungan bulan berjalan tanpa menghapus data bulan sebelumnya; import Excel/Monitoring Gaji, arsip gaji, sinkronisasi &amp; backup tersedia untuk Admin/Operator.</div>
@@ -4162,6 +4163,17 @@ function sinkronPotongan() {
   if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
   msg('Sedang menyinkronkan potongan Koperasi & potongan tetap...', 'notice');
   call('sinkronkanPotonganBulanan', [period], r => msg(r.message, 'success'));
+}
+
+function sinkronSnapshotTunkin() {
+  const period = $('periodDash').value;
+  if (!period) return msg('Pilih periode terlebih dahulu.', 'error');
+  if (!confirm('Samakan snapshot TUNKIN periode ' + period + ' dengan database personel aktif? Personel non-aktif akan dihapus dari snapshot.')) return;
+  msg('Sedang menyinkronkan snapshot tunkin...', 'notice');
+  call('sinkronkanSnapshotTunkin', [period], r => {
+    msg(r.message, 'success');
+    if ($('viewPeriod') && $('viewPeriod').value === period) loadTerpadu();
+  });
 }
 
 function backupArsip() {
